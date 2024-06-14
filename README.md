@@ -98,40 +98,48 @@ Returns the squares where caption was made.
 
 ### squares_with_Pawncaptures
 
-Returns the squares where caption was made by a pawn. The functions identical to this one are: squares_with_Bishopcaptures, squares_with_Knightcaptures, 
-squares_with_Queencaptures, squares_with_Kingcaptures, squares_with_Rookcaptures.
+Returns the squares where caption was made by a pawn. Same functions but for different pieces are: 
+- squares_with_Bishopcaptures,
+- squares_with_Knightcaptures, 
+- squares_with_Queencaptures,
+- squares_with_Kingcaptures,
+- squares_with_Rookcaptures.
 
 
-     ca.squares_with_Pawncaptures()
+      ca.squares_with_Pawncaptures()
 
-     {'e5': 5, 'b6': 2, 'd5': 3, 'e4': 2, 'e3': 2, 'g4': 1}
+      {'e5': 5, 'b6': 2, 'd5': 3, 'e4': 2, 'e3': 2, 'g4': 1}
 
 
 ### rook_moves
 
-Returns frequencies of each square that rook has gone to. Same functions but for different pieces are: queen_moves, bishop_moves, knight_moves, king_moves
+Returns frequencies of each square that rook has gone to. Same functions but for different pieces are: 
+- queen_moves,
+- bishop_moves,
+- knight_moves,
+- king_moves.
 
-     ca.rook_moves()
-     {'c8': 285, 'e8': 300, 'h8': 51, 'f3': 68, 'f8': 128, 'f1': 122}
+      ca.rook_moves()
+      {'c8': 285, 'e8': 300, 'h8': 51, 'f3': 68, 'f8': 128, 'f1': 122}
 
 
 ### squares_with_promotions
 
-Returns squares on which occured a promotion.
+Returns squares on which a promotion has occured.
 
      ca.squares_with_promotions()
      {'f8': 11, 'h8': 5, 'd8': 7, 'e8': 2, 'c1': 7, 'b1': 4, 'f1': 3, 'c8': 4}
 
 ### squares_with_checks
 
-Returns squares on which occured a check.
+Returns squares on which a check has occured.
 
      ca.squares_with_checks()
      {'f8': 37, 'e1': 61, 'e6': 37, 'e8': 40, 'f5': 43, 'd6': 35, 'd7': 42, 'h2': 19}
 
 ### squares_with_mates
 
-Returns squares on which occured a mate.
+Returns squares on which a mate has occured.
 
      ca.squares_with_mate()
      {'h8': 4, 'h1': 5, 'a8': 2, 'b8': 1, 'g7': 3, 'c6': 2, 'a4': 1, 'g8': 2, 'f3': 2}
@@ -139,14 +147,14 @@ Returns squares on which occured a mate.
 
 ### opponent_elo
 
-Returns elo of average opponent.
+Returns average opponent's elo.
 
        ca.opponent_elo()
        1970.222
 
 ### white_black_total
 
-Returns games played with white pieces,black pieces and total games.
+Returns games played with white pieces, black pieces and total games.
        
        ca.white_black_total()
        [504, 496, 1000]
@@ -168,14 +176,14 @@ Returns dictionary with frequency of x'th move of the game featuring specific op
 
 ### xth_move_square
 
-Returns dict with square of x'th move.
+Returns dict with squares of x'th move.
 
        ca.xth_move_square(move)
        {'c3': 102, 'O-O': 76, 'e3': 33, 'h3': 25, 'e1': 10}
 
 ### ranked_unranked
 
-Returns amount of ranked and unranked games played by player.
+Returns total amount of ranked and unranked games played by player.
 
        ca.ranked_unranked()
        {'Ranked': 837, 'Unranked': 163}
@@ -184,7 +192,7 @@ Returns amount of ranked and unranked games played by player.
 
 ### game_types
 
-Returns variants of games played by player.
+Returns variants of games played by player (standard, chess960, crazyhouse etc).
 
       ca.game_types()
       {'Standard': 1000}
@@ -224,21 +232,27 @@ Returns the way in which games has ended.
 
 ### blitz_progress
 
-Returns player's blitz progress. Same functions for different time controls are bullet_progress and rapid_progress.
+Returns player's blitz progress. Same functions for different time controls are:
+- bullet_progress
+- rapid_progress
 
-     ca.blitz_progress()
-     ['3001', '3002', '3004', '3005', '3006', '3007', '3008', '3000', '3003', '3007']
+      ca.blitz_progress()
+      ['3001', '3002', '3004', '3005', '3006', '3007', '3008', '3000', '3003', '3007']
 
 ### blitz_progress_date
 
-Returns player's progress on certain date. Same functions for different time controls are bullet_progress_date and rapid_progress_date.
+Returns player's progress on certain date. Same functions for different time controls are:
+- bullet_progress_date
+- rapid_progress_date
 
       ca.blitz_progress_date()
       {'2024.05.25': 6, '2024.05.17': 0, '2024.05.14': 6, '2024.05.13': 2, '2024.05.12': -7}
 
 ### blitz_progress_hour
 
-Returns player's progress on certain date. Same functions for different time controls are bullet_progress_hour and rapid_progress_hour.
+Returns player's progress on certain date. Same functions for different time controls are:
+- bullet_progress_hour
+- rapid_progress_hour
 
       ca.blitz_progress_hour()
       {'23': -14, '22': 8, '20': 82, '19': -24, '17': -29, '11': -20, '21': 92}
