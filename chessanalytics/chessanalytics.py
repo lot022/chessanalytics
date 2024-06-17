@@ -3,11 +3,6 @@ import datetime
 import scipy.stats as ss
 
 
-
-# code below may not be the most readable but it's certainly not clear 
-
-
-
 class CA:
 
     def __init__(self, plik, name, token=None):
@@ -2375,8 +2370,39 @@ class CA:
 
 #########################                   STATISTICAL // AVERAGE  RELATED FUNCTIONS              #############################
 
+    def shortest_game(self, game=True) -> int:
+        '''
+        Returns shortest game.
 
-    def avg_gameLength(self) -> int:
+        Params:
+        
+        game (bool): If set to True, returns game. If set to False, returns length of game
+        '''
+
+        gierki = CA.pure_moves(self)
+
+        gierki = sorted(gierki, key=lambda x: len(x.split()))
+
+        gierki = [el for el in gierki if len(el.split()) > 1] # sometimes it happens that game was abandoned and then game is marked with ' '
+
+        return gierki[0] if game else len(gierki[0])          # and I do not think that anybody considers it a shortest game
+
+
+    def fastest_mate(self) -> int:
+        '''
+        Returns fastest mate.
+        '''
+
+        gry = CA.pure_moves(self)
+
+        gry = [el for el in gry if '#' in el]
+
+        gry = sorted(gry, key=lambda x: len(x.split())) # mate is always the last move so no need to check # index or other method, keep it simple
+
+        return len(gry[0].split())
+
+
+    def avg_game_length(self) -> int:
         '''
         Returns average game length. e4 e5 Nf3 Nf6 are treated as 4 moves.
         '''
@@ -3599,6 +3625,15 @@ class CA:
     
                     
     def squares_with_promotions(self, only_player_games : bool = True) -> dict:
+        ''''
+        Returns squares with pawn promotions.
+
+        Params:
+
+            only_player_games (bool): Determines if only moves played by player are counted. By default set to True.
+        
+        '''
+
 
         d = {}
 
@@ -3671,6 +3706,14 @@ class CA:
 
 
     def squares_with_checks(self, only_player_games : bool = True) -> dict:
+        '''
+        Returns squares with checks.
+
+        Params:
+            
+                only_player_games (bool): Determines if only moves played by player are counted. By default set to True.
+                If set to False, moves made by opponent count as well.
+        '''
 
         d = {}
 
@@ -3778,6 +3821,16 @@ class CA:
 
 
     def squares_with_mates(self, only_player_games : bool = True) -> dict:
+        '''
+        Returns squares with checkmates.
+
+        Params:
+            
+                only_player_games (bool): Determines if only moves played by player are counted. By default set to True.
+                If set to False, moves made by opponent count as well.
+
+        '''
+
 
         d = {}
 
