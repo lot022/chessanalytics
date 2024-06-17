@@ -69,11 +69,25 @@ Returns games played by player on certain date. Date should be passed in yyyy/mm
 
 # Statistical / Average related functions
 
-### avg_gameLength
+### fastest_mate
+
+Returns game where the fastest mate has occured. If param 'game' is set to False, function returns length of the game.
+
+       ca.fastest_mate(game=True)
+       b3 e5 Bb2 d6 e3 Nf6 c4 Nc6 Nc3 Be7 f4 Be6 fxe5 Nxe5 Nge2 Nd3#
+
+### shortest_game
+
+Returns shortest game from the file. If param 'game' is set to False, function returns length of the game
+
+       ca.shortest_game(game=True)
+       d4 Nf6
+
+### avg_game_length
 
 Returns average of moves for all games in file.
 
-     ca.game_length()
+     ca.avg_game_length()
 
      22.0
 
