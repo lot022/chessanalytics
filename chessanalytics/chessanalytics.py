@@ -2601,11 +2601,13 @@ class CA:
                                 
                                 hmhm = ruch[-2:]
 
-                            if hmhm not in d:
+                            if len(hmhm) == 2:
 
-                                d[hmhm] = 0
+                                if hmhm not in d:
 
-                            d[hmhm] += 1
+                                    d[hmhm] = 0
+
+                                d[hmhm] += 1
 
 
             for partia in bg:
@@ -2628,11 +2630,13 @@ class CA:
                                 
                                 hmhm = ruch[-2:]
 
-                            if hmhm not in d:
+                            if len(hmhm) == 2:
 
-                                d[hmhm] = 0
+                                if hmhm not in d:
 
-                            d[hmhm] += 1
+                                    d[hmhm] = 0
+
+                                d[hmhm] += 1
 
 
 
@@ -2657,10 +2661,12 @@ class CA:
                         else:
                             hm = ruch[-2:]
 
-                        if hm not in d:
-                            d[hm] = 0
+                        if len(hm) == 2:
 
-                        d[hm] += 1
+                            if hm not in d:
+                                d[hm] = 0
+
+                            d[hm] += 1
 
 
         return d
@@ -2707,11 +2713,13 @@ class CA:
                                 
                                 hmhm = ruch[-2:]
 
-                            if hmhm not in d:
+                            if len(hmhm) == 2:
 
-                                d[hmhm] = 0
+                                if hmhm not in d:
 
-                            d[hmhm] += 1
+                                    d[hmhm] = 0
+
+                                d[hmhm] += 1
 
 
             for partia in bg:
@@ -2734,11 +2742,13 @@ class CA:
                                 
                                 hmhm = ruch[-2:]
 
-                            if hmhm not in d:
+                            if len(hmhm) == 2:
 
-                                d[hmhm] = 0
+                                if hmhm not in d:
 
-                            d[hmhm] += 1
+                                    d[hmhm] = 0
+
+                                d[hmhm] += 1
 
 
 
@@ -2763,10 +2773,12 @@ class CA:
                         else:
                             hm = ruch[-2:]
 
-                        if hm not in d:
-                            d[hm] = 0
+                        if len(hm) == 2:
 
-                        d[hm] += 1
+                            if hm not in d:
+                                d[hm] = 0
+
+                            d[hm] += 1
 
 
         return d
@@ -2811,11 +2823,13 @@ class CA:
                                 
                                 hmhm = ruch[-2:]
 
-                            if hmhm not in d:
+                            if len(hmhm) == 2:
 
-                                d[hmhm] = 0
+                                if hmhm not in d:
 
-                            d[hmhm] += 1
+                                    d[hmhm] = 0
+
+                                d[hmhm] += 1
 
 
             for partia in bg:
@@ -2838,11 +2852,13 @@ class CA:
                                 
                                 hmhm = ruch[-2:]
 
-                            if hmhm not in d:
+                            if len(hmhm) == 2:
 
-                                d[hmhm] = 0
+                                if hmhm not in d:
 
-                            d[hmhm] += 1
+                                    d[hmhm] = 0
+
+                                d[hmhm] += 1
 
 
 
@@ -2867,10 +2883,12 @@ class CA:
                         else:
                             hm = ruch[-2:]
 
-                        if hm not in d:
-                            d[hm] = 0
+                        if len(hm) == 2:
 
-                        d[hm] += 1
+                            if hm not in d:
+                                d[hm] = 0
+
+                            d[hm] += 1
 
 
         return d
@@ -2914,11 +2932,13 @@ class CA:
                                 
                                 hmhm = ruch[-2:]
 
-                            if hmhm not in d:
+                            if len(hmhm) == 2:
 
-                                d[hmhm] = 0
+                                if hmhm not in d:
 
-                            d[hmhm] += 1
+                                    d[hmhm] = 0
+
+                                d[hmhm] += 1
 
 
             for partia in bg:
@@ -2941,11 +2961,13 @@ class CA:
                                 
                                 hmhm = ruch[-2:]
 
-                            if hmhm not in d:
+                            if len(hmhm) == 2:
 
-                                d[hmhm] = 0
+                                if hmhm not in d:
 
-                            d[hmhm] += 1
+                                    d[hmhm] = 0
+
+                                d[hmhm] += 1
 
 
 
@@ -2970,10 +2992,12 @@ class CA:
                         else:
                             hm = ruch[-2:]
 
-                        if hm not in d:
-                            d[hm] = 0
+                        if len(hm) == 2:
 
-                        d[hm] += 1
+                            if hm not in d:
+                                d[hm] = 0
+
+                            d[hm] += 1
 
 
         return d
@@ -3016,11 +3040,13 @@ class CA:
                                 
                                 hmhm = ruch[-2:]
 
-                            if hmhm not in d:
+                            if len(hmhm) == 2:
 
-                                d[hmhm] = 0
+                                if hmhm not in d:
 
-                            d[hmhm] += 1
+                                    d[hmhm] = 0
+
+                                d[hmhm] += 1
 
 
             for partia in bg:
@@ -3043,11 +3069,13 @@ class CA:
                                 
                                 hmhm = ruch[-2:]
 
-                            if hmhm not in d:
+                            if len(hmhm) == 2:
 
-                                d[hmhm] = 0
+                                if hmhm not in d:
 
-                            d[hmhm] += 1
+                                    d[hmhm] = 0
+
+                                d[hmhm] += 1
 
 
 
@@ -3072,10 +3100,12 @@ class CA:
                         else:
                             hm = ruch[-2:]
 
-                        if hm not in d:
-                            d[hm] = 0
+                        if len(hm) == 2:
 
-                        d[hm] += 1
+                            if hm not in d:
+                                d[hm] = 0
+
+                            d[hm] += 1
 
 
         return d
@@ -3110,10 +3140,12 @@ class CA:
 
                         el = el[2:]
 
-                        if el not in d:
-                            d[el] = 0
+                        if len(el) == 2:
 
-                        d[el] += 1
+                            if el not in d:
+                                d[el] = 0
+
+                            d[el] += 1
         
         else:
 
@@ -3134,10 +3166,12 @@ class CA:
 
                         ruch = ruch[g+1:]
 
-                        if ruch not in d:
-                            d[ruch] = 0
+                        if len(ruch) == 2:
 
-                        d[ruch] += 1
+                            if ruch not in d:
+                                d[ruch] = 0
+
+                            d[ruch] += 1
 
             for gierka in bg:
 
@@ -3154,10 +3188,12 @@ class CA:
 
                         ruch = ruch[g+1:]
 
-                        if ruch not in d:
-                            d[ruch] = 0
+                        if len(ruch) == 2:
 
-                        d[ruch] += 1
+                            if ruch not in d:
+                                d[ruch] = 0
+
+                            d[ruch] += 1
 
 
 
@@ -3188,10 +3224,12 @@ class CA:
 
                         el = el[2:]
 
-                        if el not in d:
-                            d[el] = 0
+                        if len(el) == 2:
+                            if el not in d:
+                                d[el] = 0
 
-                        d[el] += 1
+                            d[el] += 1
+
 
 
         else:
@@ -3214,10 +3252,11 @@ class CA:
                             if len(ruch) == 3:
                                 ruch = ruch[1:]
 
-                            if ruch not in d:
-                                d[ruch] = 0
+                            if len(ruch) == 2:
+                                if ruch not in d:
+                                    d[ruch] = 0
 
-                            d[ruch] += 1
+                                d[ruch] += 1
 
 
             for gierka in bg:
@@ -3235,10 +3274,11 @@ class CA:
                             if len(ruch) == 3:
                                 ruch = ruch[1:]
 
-                            if ruch not in d:
-                                d[ruch] = 0
+                            if len(ruch) == 2:
+                                if ruch not in d:
+                                    d[ruch] = 0
 
-                            d[ruch] += 1
+                                d[ruch] += 1
 
         
         return d
@@ -3268,10 +3308,11 @@ class CA:
 
                         el = el[2:]
 
-                        if el not in d:
-                            d[el] = 0
+                        if len(el) == 2:
+                            if el not in d:
+                                d[el] = 0
 
-                        d[el] += 1
+                            d[el] += 1
 
         else:
 
@@ -3293,10 +3334,11 @@ class CA:
                             if len(ruch) == 3:
                                 ruch = ruch[1:]
 
-                            if ruch not in d:
-                                d[ruch] = 0
+                            if len(ruch) == 2:
+                                if ruch not in d:
+                                    d[ruch] = 0
 
-                            d[ruch] += 1
+                                d[ruch] += 1
 
 
             for gierka in bg:
@@ -3314,10 +3356,11 @@ class CA:
                             if len(ruch) == 3:
                                 ruch = ruch[1:]
 
-                            if ruch not in d:
-                                d[ruch] = 0
+                            if len(ruch) == 2:
+                                if ruch not in d:
+                                    d[ruch] = 0
 
-                            d[ruch] += 1
+                                d[ruch] += 1
 
         
         return d
@@ -3347,10 +3390,12 @@ class CA:
 
                         el = el[2:]
 
-                        if el not in d:
-                            d[el] = 0
+                        if len(el) == 2:
 
-                        d[el] += 1
+                            if el not in d:
+                                d[el] = 0
+
+                            d[el] += 1
 
         else:
 
@@ -3372,10 +3417,12 @@ class CA:
                             if len(ruch) == 3:
                                 ruch = ruch[1:]
 
-                            if ruch not in d:
-                                d[ruch] = 0
+                            if len(ruch) == 2:
 
-                            d[ruch] += 1
+                                if ruch not in d:
+                                    d[ruch] = 0
+
+                                d[ruch] += 1
 
 
             for gierka in bg:
@@ -3393,10 +3440,12 @@ class CA:
                             if len(ruch) == 3:
                                 ruch = ruch[1:]
 
-                            if ruch not in d:
-                                d[ruch] = 0
+                            if len(ruch) == 2:
 
-                            d[ruch] += 1
+                                if ruch not in d:
+                                    d[ruch] = 0
+
+                                d[ruch] += 1
 
         
         return d
@@ -3427,10 +3476,12 @@ class CA:
 
                         el = el[2:]
 
-                        if el not in d:
-                            d[el] = 0
+                        if len(el) == 2:
 
-                        d[el] += 1
+                            if el not in d:
+                                d[el] = 0
+
+                            d[el] += 1
             
 
         else:
@@ -3453,10 +3504,12 @@ class CA:
                             if len(ruch) == 3:
                                 ruch = ruch[1:]
 
-                            if ruch not in d:
-                                d[ruch] = 0
+                            if len(ruch) == 2:
 
-                            d[ruch] += 1
+                                if ruch not in d:
+                                    d[ruch] = 0
+
+                                d[ruch] += 1
 
 
             for gierka in bg:
@@ -3474,10 +3527,12 @@ class CA:
                             if len(ruch) == 3:
                                 ruch = ruch[1:]
 
-                            if ruch not in d:
-                                d[ruch] = 0
+                            if len(ruch) == 2:
 
-                            d[ruch] += 1
+                                if ruch not in d:
+                                    d[ruch] = 0
+
+                                d[ruch] += 1
 
         return d
 
@@ -3507,10 +3562,12 @@ class CA:
 
                         el = el[2:]
 
-                        if el not in d:
-                            d[el] = 0
+                        if len(el) == 2:
 
-                        d[el] += 1
+                            if el not in d:
+                                d[el] = 0
+
+                            d[el] += 1
 
         else:
 
@@ -3529,10 +3586,31 @@ class CA:
                             if len(ruch) == 3:
                                 ruch = ruch[1:]
 
-                            if ruch not in d:
-                                d[ruch] = 0
+                            if len(ruch) == 2:
 
-                            d[ruch] += 1
+                                if ruch not in d:
+                                    d[ruch] = 0
+
+                                d[ruch] += 1
+
+            for partia in bg:
+
+                for i, ruch in enumerate(partia.split()):
+                    if i % 2 != 0:
+                            
+                            if ruch[0] == 'K':
+    
+                                ruch = ruch.replace('+', '').replace('x','')
+
+                            if len(ruch) == 3:
+                                ruch = ruch[1:]
+
+                            if len(ruch) == 2:
+                                    
+                                if ruch not in d:
+                                    d[ruch] = 0
+    
+                                d[ruch] += 1
                         
         return d
     
@@ -3569,10 +3647,12 @@ class CA:
 
                         el = el[2:]
 
-                        if el not in d:
-                            d[el] = 0
+                        if len(el) == 2:
 
-                        d[el] += 1
+                            if el not in d:
+                                d[el] = 0
+
+                            d[el] += 1
             
 
         else:
@@ -3595,10 +3675,12 @@ class CA:
                             if len(ruch) == 3:
                                 ruch = ruch[1:]
 
-                            if ruch not in d:
-                                d[ruch] = 0
+                            if len(ruch) == 2:
 
-                            d[ruch] += 1
+                                if ruch not in d:
+                                    d[ruch] = 0
+
+                                d[ruch] += 1
 
 
             for gierka in bg:
@@ -3616,10 +3698,12 @@ class CA:
                             if len(ruch) == 3:
                                 ruch = ruch[1:]
 
-                            if ruch not in d:
-                                d[ruch] = 0
+                            if len(ruch) == 2:
 
-                            d[ruch] += 1
+                                if ruch not in d:
+                                    d[ruch] = 0
+
+                                d[ruch] += 1
 
         return d
     
@@ -3649,17 +3733,20 @@ class CA:
 
                         if 'x' in el:
                             el = el[2:4]
+                            if len(el) == 2:
+                                if el not in d:
+                                    d[el] = 0
+
+                                d[el] += 1
+
+                        el = el[:2]
+
+                        if len(el) == 2:
+
                             if el not in d:
                                 d[el] = 0
 
                             d[el] += 1
-
-                        el = el[:2]
-
-                        if el not in d:
-                            d[el] = 0
-
-                        d[el] += 1
 
         else:
 
@@ -3671,17 +3758,20 @@ class CA:
 
                         if 'x' in el:
                             el = el[2:4]
+                            if len(el) == 2:
+                                if el not in d:
+                                    d[el] = 0
+
+                                d[el] += 1
+
+                        el = el[:2]
+
+                        if len(el) == 2:
+    
                             if el not in d:
                                 d[el] = 0
 
                             d[el] += 1
-
-                        el = el[:2]
-
-                        if el not in d:
-                            d[el] = 0
-
-                        d[el] += 1
 
             for gierka in bg:
 
@@ -3690,17 +3780,20 @@ class CA:
 
                         if 'x' in el:
                             el = el[2:4]
+                            if len(el) == 2:
+                                if el not in d:
+                                    d[el] = 0
+
+                                d[el] += 1
+
+                        el = el[:2]
+
+                        if len(el) == 2:
+
                             if el not in d:
                                 d[el] = 0
 
                             d[el] += 1
-
-                        el = el[:2]
-
-                        if el not in d:
-                            d[el] = 0
-
-                        d[el] += 1
 
         return d
 
@@ -3733,24 +3826,28 @@ class CA:
 
                             el = el[1:]
 
-                            if el not in d:
-                                d[el] = 0
+                            if len(el) == 2:
 
-                            d[el] += 1
+                                if el not in d:
+                                    d[el] = 0
+
+                                d[el] += 1
 
                         elif 'x' in el and '=' not in el:
                             el = el[-2:]
-                            if el not in d:
-                                d[el] = 0
+                            if len(el) == 2:
+                                if el not in d:
+                                    d[el] = 0
 
-                            d[el] += 1
+                                d[el] += 1
 
                         elif '=' in el:
                             el = el[-4:-2]
-                            if el not in d:
-                                d[el] = 0
+                            if len(el) == 2:
+                                if el not in d:
+                                    d[el] = 0
 
-                            d[el] += 1
+                                d[el] += 1
 
         else:
 
@@ -3767,24 +3864,30 @@ class CA:
 
                             el = el[1:]
 
-                            if el not in d:
-                                d[el] = 0
+                            if len(el) == 2:
 
-                            d[el] += 1
+                                if el not in d:
+                                    d[el] = 0
+
+                                d[el] += 1
 
                         elif 'x' in el and '=' not in el:
                             el = el[-2:]
-                            if el not in d:
-                                d[el] = 0
 
-                            d[el] += 1
+                            if len(el )== 2:
+                                if el not in d:
+                                    d[el] = 0
+
+                                d[el] += 1
 
                         elif '=' in el:
                             el = el[-4:-2]
-                            if el not in d:
-                                d[el] = 0
 
-                            d[el] += 1
+                            if len(el) == 2:
+                                if el not in d:
+                                    d[el] = 0
+
+                                d[el] += 1
 
             for gierka in bg:
                 for i, el in enumerate(gierka.split()):
@@ -3796,24 +3899,28 @@ class CA:
 
                             el = el[1:]
 
-                            if el not in d:
-                                d[el] = 0
+                            if len(el) == 2:
 
-                            d[el] += 1
+                                if el not in d:
+                                    d[el] = 0
+
+                                d[el] += 1
 
                         elif 'x' in el and '=' not in el:
                             el = el[-2:]
-                            if el not in d:
-                                d[el] = 0
+                            if len(el) == 2:
+                                if el not in d:
+                                    d[el] = 0
 
-                            d[el] += 1
+                                d[el] += 1
 
                         elif '=' in el:
                             el = el[-4:-2]
-                            if el not in d:
-                                d[el] = 0
+                            if len(el) == 2:
+                                if el not in d:
+                                    d[el] = 0
 
-                            d[el] += 1
+                                d[el] += 1
 
         return d
         
@@ -3849,25 +3956,29 @@ class CA:
                             if len(el) == 3:
         
                                 el = el[1:]
+
+                                if len(el) == 2:
         
-                                if el not in d:
-                                    d[el] = 0
-        
-                                d[el] += 1
+                                    if el not in d:
+                                        d[el] = 0
+            
+                                    d[el] += 1
         
                             elif 'x' in el and '=' not in el:
                                 el = el[-2:]
-                                if el not in d:
-                                    d[el] = 0
-        
-                                d[el] += 1
+                                if len(el) == 2:
+                                    if el not in d:
+                                        d[el] = 0
+            
+                                    d[el] += 1
         
                             elif '=' in el:
                                 el = el[-4:-2]
-                                if el not in d:
-                                    d[el] = 0
-        
-                                d[el] += 1
+                                if len(el) == 2:
+                                    if el not in d:
+                                        d[el] = 0
+            
+                                    d[el] += 1
 
         else:
 
@@ -3883,24 +3994,28 @@ class CA:
 
                             el = el[1:]
 
-                            if el not in d:
-                                d[el] = 0
+                            if len(el) == 2:
 
-                            d[el] += 1
+                                if el not in d:
+                                    d[el] = 0
+
+                                d[el] += 1
 
                         elif 'x' in el and '=' not in el:
                             el = el[-2:]
-                            if el not in d:
-                                d[el] = 0
+                            if len(el) == 2:
+                                if el not in d:
+                                    d[el] = 0
 
-                            d[el] += 1
+                                d[el] += 1
 
                         elif '=' in el:
                             el = el[-4:-2]
-                            if el not in d:
-                                d[el] = 0
+                            if len(el) == 2:
+                                if el not in d:
+                                    d[el] = 0
 
-                            d[el] += 1
+                                d[el] += 1
             
             for gierka in bg:
                 for i, el in enumerate(gierka.split()):
@@ -3912,6 +4027,8 @@ class CA:
 
                             el = el[1:]
 
+                        if len(el) == 2:
+
                             if el not in d:
                                 d[el] = 0
 
@@ -3919,17 +4036,21 @@ class CA:
 
                         elif 'x' in el and '=' not in el:
                             el = el[-2:]
-                            if el not in d:
-                                d[el] = 0
+                            if len(el) == 2:
+                                if el not in d:
+                                    d[el] = 0
 
-                            d[el] += 1
+                                d[el] += 1
 
                         elif '=' in el:
-                            el = el[-4:-2]
-                            if el not in d:
-                                d[el] = 0
 
-                            d[el] += 1 
+                            el = el[-4:-2]
+
+                            if len(el) == 2:
+                                if el not in d:
+                                    d[el] = 0
+
+                                d[el] += 1 
 
         return d
-
+    
