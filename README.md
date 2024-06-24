@@ -25,7 +25,7 @@ When initializing class as first parameter pass the path to file with your chess
 Returns all the data from the file as a dictionary. 
 
      ca.get_all()
-     1 : ['unranked', 'rapid', 'PUrzVgJd', '2023.12.02', 'Player01', 'Player02', '1-0', '2023.12.02', '16:54:06', '2091', 
+     1 : ['unranked', 'rapid', 'vGukLo13', '2023.12.02', 'Player01', 'Player02', '1-0', '2023.12.02', '16:54:06', '2091', 
      '2181', 'Standard', '600+2', 'D00', "Queen's Pawn Game", 'Normal', 
      '1. d4 d5 2. c3 c5 3. Nf3 cxd4 4. cxd4 g6 5. Bd2 Bg7 6. Bc3 Nf6 7. e3 Nc6 8. Bb5 a6 9. Qa4 Qb6 10. Na3 O-O']
 
