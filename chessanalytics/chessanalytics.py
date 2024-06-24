@@ -18,7 +18,115 @@ class CA:
 
 
 
-# best and only way to get all games from the file
+    def get_all(self,pgn_tags : bool=True) -> dict:
+        '''
+        Gets all data from the file and returns it as a dictionary. If pgn_tags var is set to True, then the function will add the games with pgn tags.
+
+        Params:
+        pgn_tags (bool): If set to True, the function will not strip the games off pgn tags.
+        '''
+
+        i,d = 0, {}
+
+        with open(self.plik) as f:
+            for line in f:
+
+                if '[Event ' in line:
+
+                    i += 1
+
+                    d[i] = []
+
+                    if 'Casual' in line:
+                        d[i].append('unranked')
+
+                    if 'Rated' in line:
+                        d[i].append('ranked')
+
+                    # not all tournaments have 'tournament' in their name.....
+                    
+                    if 'tournament' not in line or 'Tournament' not in line:
+
+                        # often tournament games are called in lowercase
+                        if 'bullet' in line or 'Bullet' in line:
+                            d[i].append('bullet')
+
+                        elif 'blitz' in line or 'Blitz' in line:
+                            d[i].append('blitz')
+
+                        elif 'rapid' in line or 'Rapid' in line:
+                            d[i].append('rapid')
+
+                        elif 'classical' in line or 'Classical' in line:
+                            d[i].append('classical')
+
+                        elif 'correspondence' in line or 'Correspondence' in line:
+                            d[i].append('correspondence')
+
+                        elif 'unlimited' in line or 'Unlimited' in line:
+                            d[i].append('unlimited')
+
+                        else:
+                            d[i].append('other')
+                    else:
+                        d[i].append('tournament game')
+
+                if '[Site ' in line:
+                    d[i].append(line.split('"')[1].split('/')[3])
+
+                if '[Date ' in line:
+                    d[i].append(line.split('"')[1])
+
+                if '[White ' in line:
+                    d[i].append(line.split('"')[1])
+                
+                if '[Black ' in line:
+                    d[i].append(line.split('"')[1])
+
+                if '[Result ' in line:
+                    d[i].append(line.split('"')[1])
+
+                if '[UTCDate ' in line:
+                    d[i].append(line.split('"')[1])
+
+                if '[UTCTime ' in line:
+                    d[i].append(line.split('"')[1])
+
+                if '[WhiteElo ' in line:
+                    d[i].append(line.split('"')[1])
+
+                if '[BlackElo ' in line:
+                    d[i].append(line.split('"')[1])
+
+                if '[WhiteRatingDiff ' in line:
+                    d[i].append(line.split('"')[1])
+
+                if '[BlackRatingDiff ' in line:
+                    d[i].append(line.split('"')[1])
+
+                if '[Variant ' in line:
+                    d[i].append(line.split('"')[1])
+
+                if '[TimeControl ' in line:
+                    d[i].append(line.split('"')[1])
+
+                if '[ECO ' in line:
+                    d[i].append(line.split('"')[1])
+
+                if '[Opening ' in line:
+                    d[i].append(line.split('"')[1])
+
+                if '[Termination ' in line:
+                    d[i].append(line.split('"')[1])
+
+                if '1.' in line and f'\n' in line:
+                    d[i].append(line.replace('\n', '')) if pgn_tags else d[i].append(line.replace('\n', '').replace('1-0', '').replace('0-1', '').replace('1/2-1/2', '').replace('1/2-1/2', ''))
+    
+
+        return d
+
+
+
     def pure_moves(self) -> list:
 
         """"
@@ -2339,6 +2447,9 @@ class CA:
         Returns num of ranked and unranked games.
         '''
 
+        # i know that tournament names often do not describe if they are ranked or unranked, so if games are not specified as ranked/unranked the func 
+        # will not count them.
+
         d = {'Ranked' : 0, 'Unranked' : 0}
 
         with open(self.plik, 'r') as plik:
@@ -2353,7 +2464,7 @@ class CA:
 
                         d['Ranked'] += 1
 
-                    elif 'Rated' not in line:
+                    elif 'Casual' in line:   
 
                         d['Unranked'] += 1
 
@@ -4054,3 +4165,4 @@ class CA:
 
         return d
     
+
