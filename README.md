@@ -233,14 +233,14 @@ Returns time control of games played by player.
 
 Returns count of games played in specific date.
 
-     ca.count_of_gamesDate
+     ca.count_of_games_Date
      {'2024.05.25': 4, '2024.05.17': 6, '2024.05.14': 2, '2024.05.13': 2, '2024.05.12': 18}
 
 ### count_ofGames_Time
 
 Returns count of games played in specific date.
 
-     ca.count_of_gamesTime
+     ca.count_of_games_Time
      {'23': 124, '22': 112, '20': 164, '19': 148, '17': 42, '11': 35, '21': 137}
 
 ### termination_stats
@@ -285,7 +285,7 @@ Returns player's progress on certain date. Same functions for different time con
 
 Returns player's win percentage while playing with white pieces.
 
-      ca.win_percentage_black()
+      ca.win_percentage_white()
       0.685
 
 ### win_percentage_black
