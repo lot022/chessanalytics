@@ -22,12 +22,14 @@ When initializing class as first parameter pass the path to file with your chess
 
 ### get_all
 
-Returns all the data from the file as a dictionary. 
+Returns all the data from the file as a dictionary. Parameter detailed, by default set to True, specifies if the output should be detailed (like in png file) or just as a pure list of occurences.
+Here you can see the difference between both outputs.
 
-     ca.get_all()
-     1 : ['unranked', 'rapid', 'vGukLo13', '2023.12.02', 'Player01', 'Player02', '1-0', '2023.12.02', '16:54:06', '2091', 
-     '2181', 'Standard', '600+2', 'D00', "Queen's Pawn Game", 'Normal', 
-     '1. d4 d5 2. c3 c5 3. Nf3 cxd4 4. cxd4 g6 5. Bd2 Bg7 6. Bc3 Nf6 7. e3 Nc6 8. Bb5 a6 9. Qa4 Qb6 10. Na3 O-O']
+     ca.get_all(detailed=False)
+     {1 : ['unranked', 'rapid', 'vGukLo13', '2023.12.02', 'Player01', 'Player02', '1-0', '2023.12.02', '16:54:06', '2091', '2181']}
+
+     ca.get_all(detailed=True)
+     {1 : {'event': 'Sample Chess Tournament', 'ranked': 'unknown', 'game_id': 'L0veS0s4', 'date': '2024.05.25', 'white': 'Player03', 'black': 'Player04', 'result': '0-1'}}
 
 ### pure_moves
 
