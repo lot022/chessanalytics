@@ -16,6 +16,11 @@ When initializing class as first parameter pass the path to file with your chess
 
       ca = CA(path_to_file, username)
 
+If your goal is to use functions that do not need specified username to work properly (f.e. get_all, pure_moves, remove_movechars), I suggest just passing one space sign or something like this:
+
+       from chessanalytics import CA
+       ca = CA(path/to/pgn, name='')   
+
 
 
 # Game manipulation related functions
