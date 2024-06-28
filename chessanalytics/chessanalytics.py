@@ -9,7 +9,7 @@ class CA:
 
         self.plik = plik
         self.name = name
-        self.token = token                # for integration with lichess API, not yet done but will add soon tho
+        self.token = token                # for integration with lichess API, not yet done but will add soon 
 
 
 
@@ -17,114 +17,172 @@ class CA:
 ###########                                       FUNCTIONS RELATED TO SIMPLE GAME-MANIPULATION OPERATIONS             ###########
 
 
-
-    def get_all(self,pgn_tags : bool=True) -> dict:
+    def get_all(self,pgn_tags : bool=True, detailed : bool =True) -> dict:
         '''
         Gets all data from the file and returns it as a dictionary. If pgn_tags var is set to True, then the function will add the games with pgn tags.
 
         Params:
         pgn_tags (bool): If set to True, the function will not strip the games off pgn tags.
+        detailed (bool): If set to True, all the games in the dictionary will be described. If a certain value will be absent, it will be marked as unknown.
+        Else, every game will be just a pure list of information strictly from pgn to list format. 
         '''
 
         i,d = 0, {}
 
-        with open(self.plik) as f:
-            for line in f:
+        if not detailed:
 
-                if '[Event ' in line:
+            with open(self.plik) as f:
+                for line in f:
 
-                    i += 1
+                    if '[Event ' in line:
 
-                    d[i] = []
+                        i += 1
 
-                    if 'Casual' in line:
-                        d[i].append('unranked')
+                        d[i] = [] 
 
-                    if 'Rated' in line:
-                        d[i].append('ranked')
+                        d[i].append(line.split('"')[1])
 
-                    # not all tournaments have 'tournament' in their name.....
+                        if 'Ranked' in line:
+                            d[i].append('ranked')
+
+                        if 'Casual' in line:
+                            d[i].append('unranked')
+
+                        if not 'Ranked' in line and not 'Casual' in line:
+                            d[i].append('unknown')
+
+                    if '[Site ' in line:
+                        d[i].append(line.split('"')[1].split('/')[3])
+
+                    if '[Date ' in line:
+                        d[i].append(line.split('"')[1])
+
+                    if '[White ' in line:
+                        d[i].append(line.split('"')[1])
                     
-                    if 'tournament' not in line or 'Tournament' not in line:
+                    if '[Black ' in line:
+                        d[i].append(line.split('"')[1])
 
-                        # often tournament games are called in lowercase
-                        if 'bullet' in line or 'Bullet' in line:
-                            d[i].append('bullet')
+                    if '[Result ' in line:
+                        d[i].append(line.split('"')[1])
 
-                        elif 'blitz' in line or 'Blitz' in line:
-                            d[i].append('blitz')
+                    if '[UTCDate ' in line:
+                        d[i].append(line.split('"')[1])
 
-                        elif 'rapid' in line or 'Rapid' in line:
-                            d[i].append('rapid')
+                    if '[UTCTime ' in line:
+                        d[i].append(line.split('"')[1])
 
-                        elif 'classical' in line or 'Classical' in line:
-                            d[i].append('classical')
+                    if '[WhiteElo ' in line:
+                        d[i].append(line.split('"')[1])
 
-                        elif 'correspondence' in line or 'Correspondence' in line:
-                            d[i].append('correspondence')
+                    if '[BlackElo ' in line:
+                        d[i].append(line.split('"')[1])
 
-                        elif 'unlimited' in line or 'Unlimited' in line:
-                            d[i].append('unlimited')
+                    if '[WhiteRatingDiff ' in line:
+                        d[i].append(line.split('"')[1])
 
-                        else:
-                            d[i].append('other')
-                    else:
-                        d[i].append('tournament game')
+                    if '[BlackRatingDiff ' in line:
+                        d[i].append(line.split('"')[1])
 
-                if '[Site ' in line:
-                    d[i].append(line.split('"')[1].split('/')[3])
+                    if '[Variant ' in line:
+                        d[i].append(line.split('"')[1])
 
-                if '[Date ' in line:
-                    d[i].append(line.split('"')[1])
+                    if '[TimeControl ' in line:
+                        d[i].append(line.split('"')[1])
 
-                if '[White ' in line:
-                    d[i].append(line.split('"')[1])
-                
-                if '[Black ' in line:
-                    d[i].append(line.split('"')[1])
+                    if '[ECO ' in line:
+                        d[i].append(line.split('"')[1])
 
-                if '[Result ' in line:
-                    d[i].append(line.split('"')[1])
+                    if '[Opening ' in line:
+                        d[i].append(line.split('"')[1])
 
-                if '[UTCDate ' in line:
-                    d[i].append(line.split('"')[1])
+                    if '[Termination ' in line:
+                        d[i].append(line.split('"')[1])
 
-                if '[UTCTime ' in line:
-                    d[i].append(line.split('"')[1])
+                    if '1.' in line and f'\n' in line:
+                        d[i].append(line.replace('\n', '')) if pgn_tags else d[i].append(line.replace('\n', '').replace('1-0', '').replace('0-1', '').replace('1/2-1/2', '').replace('1/2-1/2', ''))
 
-                if '[WhiteElo ' in line:
-                    d[i].append(line.split('"')[1])
+    # decided to use if statements, one liners made the code look messy and in this func is no room for mistake :)
+        if detailed:
 
-                if '[BlackElo ' in line:
-                    d[i].append(line.split('"')[1])
+            with open(self.plik, 'r') as plik:
+                for line in plik:
+                    if '[Event ' in line:
+                        i += 1
+                        d[i] = {}
+                        d[i]['event'] = line.split('"')[1]
 
-                if '[WhiteRatingDiff ' in line:
-                    d[i].append(line.split('"')[1])
+                        if 'Ranked' in line:
+                            d[i]['ranked'] = 'ranked'
 
-                if '[BlackRatingDiff ' in line:
-                    d[i].append(line.split('"')[1])
+                        if 'Casual' in line:
+                            d[i]['ranked'] = 'unranked'
 
-                if '[Variant ' in line:
-                    d[i].append(line.split('"')[1])
+                        if not 'Ranked' in line and not 'Casual' in line:
+                            d[i]['ranked'] = 'unknown'
 
-                if '[TimeControl ' in line:
-                    d[i].append(line.split('"')[1])
+                    if '[Site ' in line:
+                        d[i]['game_id'] = line.split('"')[1].split('/')[3]
 
-                if '[ECO ' in line:
-                    d[i].append(line.split('"')[1])
+                    if '[Date ' in line:
+                        d[i]['date'] = line.split('"')[1]
 
-                if '[Opening ' in line:
-                    d[i].append(line.split('"')[1])
+                    if '[White ' in line:
+                        d[i]['white'] = line.split('"')[1]
 
-                if '[Termination ' in line:
-                    d[i].append(line.split('"')[1])
+                    if '[Black ' in line:
+                        d[i]['black'] = line.split('"')[1]
 
-                if '1.' in line and f'\n' in line:
-                    d[i].append(line.replace('\n', '')) if pgn_tags else d[i].append(line.replace('\n', '').replace('1-0', '').replace('0-1', '').replace('1/2-1/2', '').replace('1/2-1/2', ''))
-    
+                    if '[Result ' in line:
+                        d[i]['result'] = line.split('"')[1]
 
+                    if '[UTCDate ' in line:
+                        d[i]['utcdate'] = line.split('"')[1]
+
+                    if '[UTCTime ' in line:
+
+                        d[i]['utctime'] = line.split('"')[1]
+
+                    if '[WhiteElo ' in line:
+                        d[i]['white_elo'] = line.split('"')[1]
+
+                    if '[BlackElo ' in line:
+                        d[i]['black_elo'] = line.split('"')[1]
+
+                    if '[WhiteRatingDiff ' in line:
+                        d[i]['WhiteRatingDiff'] = line.split('"')[1]
+
+                    if '[BlackRatingDiff ' in line:
+                        d[i]['BlackRatingDiff'] = line.split('"')[1]
+
+                    if '[Variant ' in line:
+                        d[i]['variant'] = line.split('"')[1]
+
+                    if '[TimeControl ' in line:
+
+                        d[i]['timecontrol'] = line.split('"')[1]
+
+                    if '[ECO ' in line:
+                        d[i]['eco'] = line.split('"')[1]
+
+                    if '[Opening ' in line:
+                        d[i]['opening'] = line.split('"')[1]
+
+                    if '[Termination ' in line:
+                        d[i]['termination'] = line.split('"')[1]
+
+                    if '1.' in line and f'\n' in line:
+                        d[i]['game'] = line.replace('\n', '') if pgn_tags else line.replace('\n', '').replace('1-0', '').replace('0-1', '').replace('1/2-1/2', '').replace('1/2-1/2', '')
+
+            elements = ['event', 'game_id', 'date', 'white', 'black', 'result', 'utcdate', 'utctime', 'white_elo', 'black_elo', 'WhiteRatingDiff', 'BlackRatingDiff', 'variant', 'timecontrol', 'eco', 'opening', 'termination', 'game']
+
+            for v in d.values():
+                for e in elements:
+                    if e not in v:
+                        v[e] = 'unknown'
+                    
         return d
-
+    
 
 
     def pure_moves(self) -> list:
