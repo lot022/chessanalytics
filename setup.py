@@ -6,7 +6,7 @@ with open("README.md", "r") as readme:
 setup(
     name="chessanalytics",
     author="lot022",
-    version="0.6.2",
+    version="1.0.0",
     license="MIT",
     keywords="chess",
     python_requires=">=3.7",
