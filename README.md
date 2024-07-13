@@ -457,7 +457,8 @@ Returns count of openings played by player while playing as black
 
 
       
-#
+# chessanalytics - streamlit
+Till i do not make a new, fancy (and integrated) documentation, feel free checking out it's repo  [https://github.com/lot022/chessanalytics_st]  - it will be up to date till the end of july :)
 #     API FUNCTIONS
  
  These functions use Lichess API. You can read more about Lichess API on their website -> https://lichess-org.github.io/berserk/ or check their project site on pypi -> https://pypi.org/project/berserk/. Consider following safety rules when operating with API tokens as being carefuless may lead to unwanted behaviour like losing access to your account. Remember not to share your token with anyone.
