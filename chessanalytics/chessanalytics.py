@@ -5,1192 +5,1390 @@ import scipy.stats as ss
 
 class CA:
 
-    def __init__(self, plik, name, token=None):
+    def __init__(self, plik : str, name : str):
 
         self.plik = plik
         self.name = name
-        self.token = token                # for integration with lichess API, not yet done but will add soon 
+        self.games = self.Games(self)
+        self.openings = self.__Openings(self)
+        self.wdl = self.WDL(self)
+        self.player = self.__Player(self)
+        self.player.Blitz = self.__Player.Blitz(self)
+        self.player.Bullet = self.__Player.Bullet(self)
+        self.player.Rapid = self.__Player.Rapid(self)
+        self.overall = self.__Overall(self)
+        self.stats = self.__Statistics(self)
+        self.moves = self._Moves(self)
+        self.squares = self._Squares(self)
 
 
 
+    class Games:
 
-###########                                       FUNCTIONS RELATED TO SIMPLE GAME-MANIPULATION OPERATIONS             ###########
+        def __init__(self, inst):
+            self.inst = inst
 
 
-    def get_all(self,pgn_tags : bool=True, detailed : bool =True) -> dict:
-        '''
-        Gets all data from the file and returns it as a dictionary. If pgn_tags var is set to True, then the function will add the games with pgn tags.
+        def all_data(self,pgn_tags : bool=True, detailed : bool =True) -> dict:
+            '''
+            Gets all data from the file and returns it as a dictionary. If pgn_tags var is set to True, then the function will add the games with pgn tags.
 
-        Params:
-        pgn_tags (bool): If set to True, the function will not strip the games off pgn tags.
-        detailed (bool): If set to True, all the games in the dictionary will be described. If a certain value will be absent, it will be marked as unknown.
-        Else, every game will be just a pure list of information strictly from pgn to list format. 
-        '''
+            Params:
+            pgn_tags (bool): If set to True, the function will not strip the games off pgn tags.
+            detailed (bool): If set to True, all the games in the dictionary will be described. If a certain value will be absent, it will be marked as unknown.
+            Else, every game will be just a pure list of information strictly from pgn to list format. 
+            '''
 
-        i,d = 0, {}
+            i,d = 0, {}
 
-        if not detailed:
+            if not detailed:
 
-            with open(self.plik) as f:
-                for line in f:
+                with open(self.inst.plik) as f:
+                    for line in f:
 
-                    if '[Event ' in line:
+                        if '[Event ' in line:
 
-                        i += 1
+                            i += 1
 
-                        d[i] = [] 
+                            d[i] = [] 
 
-                        d[i].append(line.split('"')[1])
+                            d[i].append(line.split('"')[1])
 
-                        if 'Ranked' in line:
-                            d[i].append('ranked')
+                            if 'Ranked' in line:
+                                d[i].append('ranked')
 
-                        if 'Casual' in line:
-                            d[i].append('unranked')
+                            if 'Casual' in line:
+                                d[i].append('unranked')
 
-                        if not 'Ranked' in line and not 'Casual' in line:
-                            d[i].append('unknown')
+                            if not 'Ranked' in line and not 'Casual' in line:
+                                d[i].append('unknown')
 
-                    if '[Site ' in line:
-                        d[i].append(line.split('"')[1].split('/')[3])
+                        if '[Site ' in line:
+                            d[i].append(line.split('"')[1].split('/')[3])
 
-                    if '[Date ' in line:
-                        d[i].append(line.split('"')[1])
+                        if '[Date ' in line:
+                            d[i].append(line.split('"')[1])
 
-                    if '[White ' in line:
-                        d[i].append(line.split('"')[1])
-                    
-                    if '[Black ' in line:
-                        d[i].append(line.split('"')[1])
+                        if '[White ' in line:
+                            d[i].append(line.split('"')[1])
+                        
+                        if '[Black ' in line:
+                            d[i].append(line.split('"')[1])
 
-                    if '[Result ' in line:
-                        d[i].append(line.split('"')[1])
+                        if '[Result ' in line:
+                            d[i].append(line.split('"')[1])
 
-                    if '[UTCDate ' in line:
-                        d[i].append(line.split('"')[1])
+                        if '[UTCDate ' in line:
+                            d[i].append(line.split('"')[1])
 
-                    if '[UTCTime ' in line:
-                        d[i].append(line.split('"')[1])
+                        if '[UTCTime ' in line:
+                            d[i].append(line.split('"')[1])
 
-                    if '[WhiteElo ' in line:
-                        d[i].append(line.split('"')[1])
+                        if '[WhiteElo ' in line:
+                            d[i].append(line.split('"')[1])
 
-                    if '[BlackElo ' in line:
-                        d[i].append(line.split('"')[1])
+                        if '[BlackElo ' in line:
+                            d[i].append(line.split('"')[1])
 
-                    if '[WhiteRatingDiff ' in line:
-                        d[i].append(line.split('"')[1])
+                        if '[WhiteRatingDiff ' in line:
+                            d[i].append(line.split('"')[1])
 
-                    if '[BlackRatingDiff ' in line:
-                        d[i].append(line.split('"')[1])
+                        if '[BlackRatingDiff ' in line:
+                            d[i].append(line.split('"')[1])
 
-                    if '[Variant ' in line:
-                        d[i].append(line.split('"')[1])
+                        if '[Variant ' in line:
+                            d[i].append(line.split('"')[1])
 
-                    if '[TimeControl ' in line:
-                        d[i].append(line.split('"')[1])
+                        if '[TimeControl ' in line:
+                            d[i].append(line.split('"')[1])
 
-                    if '[ECO ' in line:
-                        d[i].append(line.split('"')[1])
+                        if '[ECO ' in line:
+                            d[i].append(line.split('"')[1])
 
-                    if '[Opening ' in line:
-                        d[i].append(line.split('"')[1])
+                        if '[Opening ' in line:
+                            d[i].append(line.split('"')[1])
 
-                    if '[Termination ' in line:
-                        d[i].append(line.split('"')[1])
+                        if '[Termination ' in line:
+                            d[i].append(line.split('"')[1])
 
-                    if '1.' in line and f'\n' in line:
-                        d[i].append(line.replace('\n', '')) if pgn_tags else d[i].append(line.replace('\n', '').replace('1-0', '').replace('0-1', '').replace('1/2-1/2', '').replace('1/2-1/2', ''))
+                        if '1.' in line and f'\n' in line:
+                            d[i].append(line.replace('\n', '')) if pgn_tags else d[i].append(line.replace('\n', '').replace('1-0', '').replace('0-1', '').replace('1/2-1/2', '').replace('1/2-1/2', ''))
 
-    # decided to use if statements, one liners made the code look messy and in this func is no room for mistake :)
-        if detailed:
+        # decided to use if statements, one liners made the code look messy and in this func is no room for mistake :)
+            if detailed:
 
-            with open(self.plik, 'r') as plik:
+                with open(self.inst.plik, 'r') as plik:
+                    for line in plik:
+                        if '[Event ' in line:
+                            i += 1
+                            d[i] = {}
+                            d[i]['event'] = line.split('"')[1]
+
+                            if 'Ranked' in line:
+                                d[i]['ranked'] = 'ranked'
+
+                            if 'Casual' in line:
+                                d[i]['ranked'] = 'unranked'
+
+                            if not 'Ranked' in line and not 'Casual' in line:
+                                d[i]['ranked'] = 'unknown'
+
+                        if '[Site ' in line:
+                            d[i]['game_id'] = line.split('"')[1].split('/')[3]
+
+                        if '[Date ' in line:
+                            d[i]['date'] = line.split('"')[1]
+
+                        if '[White ' in line:
+                            d[i]['white'] = line.split('"')[1]
+
+                        if '[Black ' in line:
+                            d[i]['black'] = line.split('"')[1]
+
+                        if '[Result ' in line:
+                            d[i]['result'] = line.split('"')[1]
+
+                        if '[UTCDate ' in line:
+                            d[i]['utcdate'] = line.split('"')[1]
+
+                        if '[UTCTime ' in line:
+
+                            d[i]['utctime'] = line.split('"')[1]
+
+                        if '[WhiteElo ' in line:
+                            d[i]['white_elo'] = line.split('"')[1]
+
+                        if '[BlackElo ' in line:
+                            d[i]['black_elo'] = line.split('"')[1]
+
+                        if '[WhiteRatingDiff ' in line:
+                            d[i]['WhiteRatingDiff'] = line.split('"')[1]
+
+                        if '[BlackRatingDiff ' in line:
+                            d[i]['BlackRatingDiff'] = line.split('"')[1]
+
+                        if '[Variant ' in line:
+                            d[i]['variant'] = line.split('"')[1]
+
+                        if '[TimeControl ' in line:
+
+                            d[i]['timecontrol'] = line.split('"')[1]
+
+                        if '[ECO ' in line:
+                            d[i]['eco'] = line.split('"')[1]
+
+                        if '[Opening ' in line:
+                            d[i]['opening'] = line.split('"')[1]
+
+                        if '[Termination ' in line:
+                            d[i]['termination'] = line.split('"')[1]
+
+                        if '1.' in line and f'\n' in line:
+                            d[i]['game'] = line.replace('\n', '') if pgn_tags else line.replace('\n', '').replace('1-0', '').replace('0-1', '').replace('1/2-1/2', '').replace('1/2-1/2', '')
+
+                elements = ['event', 'game_id', 'date', 'white', 'black', 'result', 'utcdate', 'utctime', 'white_elo', 'black_elo', 'WhiteRatingDiff', 'BlackRatingDiff', 'variant', 'timecontrol', 'eco', 'opening', 'termination', 'game']
+
+                for v in d.values():
+                    for e in elements:
+                        if e not in v:
+                            v[e] = 'unknown'
+                        
+            return d
+        
+
+        
+        def pure_moves(self) -> list:
+
+            """"
+
+            Returns all games from file in pure move format.
+            
+            """
+
+            if True:
+
+
+                with open(self.inst.plik, 'r') as plik:
+                    zawartosc = plik.read()
+
+
+                partie = re.findall(r'\n\n.*?(?=\[Event|\Z)', zawartosc, re.DOTALL)
+                partie = [partia.strip() for partia in partie]
+
+
+                for i in range(len(partie)):
+                    partie[i] = re.sub(r'\{[^}]*\}', '', partie[i])
+
+
+                for i in range(len(partie)):
+                    elements = partie[i].split()
+                    cleaned_elements = [
+                        el.replace('...', '') if el.endswith('...') else el.replace('...', '.')
+                        for el in elements
+                    ]
+                    partie[i] = ' '.join(cleaned_elements)
+                    partie[i] = self.game_without_movechars(partie[i])
+                    partie[i] = re.sub(r'\b\d+\b', '', partie[i])
+                    partie[i] = re.sub(r'\s+', ' ', partie[i]).strip()
+
+
+
+                partie = [re.sub(r'\.\s', '.', partia) for partia in partie]
+
+                return partie
+            
+
+
+        def game_without_movechars(self,game) -> list:
+            '''
+            Returns game without movechars.
+
+            Params:
+
+            game (str): game from which you want to strip of movechars.
+            '''
+
+            gra = ' '.join([el for el in game.split() if not el.endswith('.')])
+
+            gra = gra.replace('1-0', '').replace('0-1', '').replace('1/2-1/2', '') 
+
+            return gra
+        
+
+        def all_games(self) -> list:
+
+            l = []
+
+            with open(self.inst.plik,'r') as plik:
+
                 for line in plik:
-                    if '[Event ' in line:
-                        i += 1
-                        d[i] = {}
-                        d[i]['event'] = line.split('"')[1]
 
-                        if 'Ranked' in line:
-                            d[i]['ranked'] = 'ranked'
-
-                        if 'Casual' in line:
-                            d[i]['ranked'] = 'unranked'
-
-                        if not 'Ranked' in line and not 'Casual' in line:
-                            d[i]['ranked'] = 'unknown'
-
-                    if '[Site ' in line:
-                        d[i]['game_id'] = line.split('"')[1].split('/')[3]
-
-                    if '[Date ' in line:
-                        d[i]['date'] = line.split('"')[1]
-
-                    if '[White ' in line:
-                        d[i]['white'] = line.split('"')[1]
-
-                    if '[Black ' in line:
-                        d[i]['black'] = line.split('"')[1]
-
-                    if '[Result ' in line:
-                        d[i]['result'] = line.split('"')[1]
-
-                    if '[UTCDate ' in line:
-                        d[i]['utcdate'] = line.split('"')[1]
-
-                    if '[UTCTime ' in line:
-
-                        d[i]['utctime'] = line.split('"')[1]
-
-                    if '[WhiteElo ' in line:
-                        d[i]['white_elo'] = line.split('"')[1]
-
-                    if '[BlackElo ' in line:
-                        d[i]['black_elo'] = line.split('"')[1]
-
-                    if '[WhiteRatingDiff ' in line:
-                        d[i]['WhiteRatingDiff'] = line.split('"')[1]
-
-                    if '[BlackRatingDiff ' in line:
-                        d[i]['BlackRatingDiff'] = line.split('"')[1]
-
-                    if '[Variant ' in line:
-                        d[i]['variant'] = line.split('"')[1]
-
-                    if '[TimeControl ' in line:
-
-                        d[i]['timecontrol'] = line.split('"')[1]
-
-                    if '[ECO ' in line:
-                        d[i]['eco'] = line.split('"')[1]
-
-                    if '[Opening ' in line:
-                        d[i]['opening'] = line.split('"')[1]
-
-                    if '[Termination ' in line:
-                        d[i]['termination'] = line.split('"')[1]
-
-                    if '1.' in line and f'\n' in line:
-                        d[i]['game'] = line.replace('\n', '') if pgn_tags else line.replace('\n', '').replace('1-0', '').replace('0-1', '').replace('1/2-1/2', '').replace('1/2-1/2', '')
-
-            elements = ['event', 'game_id', 'date', 'white', 'black', 'result', 'utcdate', 'utctime', 'white_elo', 'black_elo', 'WhiteRatingDiff', 'BlackRatingDiff', 'variant', 'timecontrol', 'eco', 'opening', 'termination', 'game']
-
-            for v in d.values():
-                for e in elements:
-                    if e not in v:
-                        v[e] = 'unknown'
-                    
-        return d
-    
-
-
-    def pure_moves(self) -> list:
-
-        """"
-
-        Returns all games from file in pure move format.
-        
-        """
-
-        if True:
-
-
-            with open(self.plik, 'r') as plik:
-                zawartosc = plik.read()
-
-
-            partie = re.findall(r'\n\n.*?(?=\[Event|\Z)', zawartosc, re.DOTALL)
-            partie = [partia.strip() for partia in partie]
-
-
-            for i in range(len(partie)):
-                partie[i] = re.sub(r'\{[^}]*\}', '', partie[i])
-
-
-            for i in range(len(partie)):
-                elements = partie[i].split()
-                cleaned_elements = [
-                    el.replace('...', '') if el.endswith('...') else el.replace('...', '.')
-                    for el in elements
-                ]
-                partie[i] = ' '.join(cleaned_elements)
-                partie[i] = CA.game_without_movechars(self,partie[i])
-                partie[i] = re.sub(r'\b\d+\b', '', partie[i])
-                partie[i] = re.sub(r'\s+', ' ', partie[i]).strip()
-
-
-
-            partie = [re.sub(r'\.\s', '.', partia) for partia in partie]
-
-            return partie
-        
-
-
-    def game_without_movechars(self,game) -> list:
-        '''
-        Returns game without movechars.
-
-        Params:
-
-        game (str): game from which you want to strip of movechars.
-        '''
-
-        gra = ' '.join([el for el in game.split() if not el.endswith('.')])
-
-        gra = gra.replace('1-0', '').replace('0-1', '').replace('1/2-1/2', '') 
-
-        return gra
-    
-    
-
-    
-
-    def whitepc_games(self) -> list:
-
-        """
-        Returns games played by player with white pieces.
-        
-        """
-
-        l = []
-
-        with open(self.plik,'r') as plik:
-
-            for line in plik:
-
-                if f'[White "{self.name}"' in line:
-
-                    while '1. ' not in line:
-                        line = next(plik)
-
-                    l.append(line)
-
-        return l
-    
-
-    def blackpc_games(self) -> list:
-
-        """
-        Returns games played by player with black pieces.
-        
-        """
-
-        l = []
-
-        with open(self.plik,'r') as plik:
-
-            for line in plik:
-
-                if f'[Black "{self.name}"' in line:
-
-                    while '1. ' not in line:
-                        line = next(plik)
-
-                    l.append(line)
-
-        return l
-    
-
-    def games_opening(self, opening) -> list:
-        """
-        Returns games played by player after certain opening.
-
-        Args:
-
-            opening:
-
-                Name of the certain opening.
-        
-        """
-
-        l = []
-
-        with open (self.plik, 'r') as plik:
-
-            for line in plik:
-
-                if '[Opening ' in line and opening in line:
-
-                    while '1. ' not in line:
-                        line = next(plik)
-
-                    l.append(line)
-
-        return l
-    
-
-    def games_date(self, data) -> list:
-        """
-        Returns games played by player on certain date.
-
-        Args:
-
-            data:
-
-                Exact date you want to get games from, must be passed in yyyy/mm/dd [ISO 8601 standard].
-        
-        """
-
-        l = []
-
-        with open(self.plik, 'r') as plik:
-
-            for line in plik:
-
-                if '[UTCDate' in line:
-
-                    if line.split('"')[1] == data:
+                    if f'[White "{self.inst.name}"' in line:
 
                         while '1. ' not in line:
                             line = next(plik)
 
                         l.append(line)
 
-        return l
+                    elif f'[Black "{self.inst.name}"' in line:
 
+                        while '1. ' not in line:
+                            line = next(plik)
 
+                        l.append(line)
 
+            return l
 
-
-
-###############                        FUNCTIONS RELATED TO OPENINGS                       #############
-
-
-    def detailed_openings(self) -> dict:
-        """
-        Returns dictionary with names of openings as keys and their frequency in file as values. Different variants of the same opening
-        are treated distincly.
-
-        """
-
-        d = {}
-
-        with open(self.plik, 'r') as plik:
-
-            for line in plik:
-
-                if '[Opening ' in line:
-
-                    opn = line.split('"')[1]
-
-                    if opn not in d:
-                        d[opn] = 0
-
-                    d[opn] += 1
-
-        if len(d) == 0:
-            return 'No opening was found :('
         
-        return d
 
+        def whitepc_games(self) -> list:
 
+            """
+            Returns games played by player with white pieces.
+            
+            """
 
-    def notso_detailedOpenings(self) -> dict:
-        """
-        Returns frequency of not detailed openings. 'Nimzo-Larsen Attack: XYZ variation' is treated same as 'Nimzo-Larsen Attack' and 
-        'Nimzo-Larsen Attack: WZK'.
+            l = []
 
-        """
-
-        d = {}
-
-        with open(self.plik,'r') as plik:
-
-            for line in plik:
-
-                if '[Opening' in line:
-
-                    op = line.split('"')[1]
-
-                    if ':' in op:
-
-                        idx = op.index(':')
-
-                        op = op[:idx]
-
-                    if op not in d:
-                        d[op] = 0
-
-                    d[op] += 1
-
-        if len(d) == 0:
-            return 'No opening was found :( )'
-
-        return d
-    
-
-    def starting_squares(self) -> dict:
-        """
-        Returns board coordinates of first moves.
-
-        """
-
-        d = {}
-
-        gry = CA.pure_moves(self)
-
-        gry = [' '.join([el for el in gra.split() if not el.endswith('.')]) for gra in gry]
-
-        gry = [gra.replace('1-0', '').replace('0-1', '').replace('1/2-1/2', '') for gra in gry]
-
-
-        for el in gry:
-
-            if len(el.split()) > 0:
-
-                pierszy = el.split()[0]
-
-            if pierszy not in d:
-                d[pierszy] = 0
-
-            d[pierszy] += 1
-
-
-        if len(d) == 0:
-            return 'No starting square was found :('
-
-        return d
-    
-
-    def openings_by_ECO(self) -> dict:
-        """
-        Returns dictionary containing ECO codes and their frequencies.
-        """
-
-        d = {}
-
-
-        with open(self.plik,'r') as plik:
-
-            for line in plik:
-
-                if '[ECO ' in line:
-
-                    eco = line.split('"')[1][0]
-
-                    if eco not in d:
-                        d[eco] = 0
-
-                    d[eco] += 1
-
-        if len(d) == 0:
-            return 'No ECO was found in file :( '
-
-        return d
-    
-
-    def openings_with_white(self) -> dict:
-        """
-        Returns count of openings played by player with white pieces.
-        """
-        
-        d = {}
-
-        with open(self.plik, 'r') as plik:
-
-            for line in plik:
-
-                if f'[White "{self.name}"' in line:
-
-                    while '[Opening ' not in line:
-                        line = next(plik)
-
-                    opn = line.split('"')[1]
-
-                    if opn not in d:
-                        d[opn] = 0
-
-                    d[opn] += 1
-        
-        return d
-
-
-    def openings_with_black(self) -> dict:
-        """
-        Returns count of openings played by player with white pieces.
-        """
-        
-        d = {}
-
-        with open(self.plik, 'r') as plik:
-
-            for line in plik:
-
-                if f'[Black "{self.name}"' in line:
-
-                    while '[Opening ' not in line:
-                        line = next(plik)
-
-                    opn = line.split('"')[1]
-
-                    if opn not in d:
-                        d[opn] = 0
-
-                    d[opn] += 1
-        
-        return d
-
-
-
-
-##################                            WIN / DRAW / LOSS RELATED FUNCTIONS                             #############
-
-
-
-
-
-
-    def WDL_stats(self) -> dict:
-        """
-        Returns player's Win/Draw/Loss stats.
-        """
-
-
-        win,loss,draw = 0,0,0
-
-        with open(self.plik, 'r') as plik:
-
-            for line in plik:
-
-                if f'[White "{self.name}"' in line:
-
-                    while '[Result' not in line:
-                        line = next(plik)
-
-                    if '[Result "1-0"]' in line:
-
-                        win += 1
-
-                    elif '[Result "0-1"]' in line:
-
-                        loss += 1
-
-                    elif '[Result "1/2-1/2"]' in line:
-                        draw += 1
-
-
-                elif f'[Black "{self.name}"' in line:
-
-                    while '[Result' not in line:
-                        line = next(plik)
-
-                    if '[Result "1-0"]' in line:
-
-                        loss += 1
-
-                    elif '[Result "0-1"]' in line:
-                        win += 1
-
-                    elif '[Result "1/2-1/2"]' in line:
-                        draw += 1
-                        
-
-            return win,draw,loss
-
-
-# detailed set to False treats Nimzo-Larssen Attack and Nimzo-Larssen Attack : Classical Variation like 2 different openings, while detailed=True thinks that they're the same :)
-
-    def WDL_Opening(self, detailed: bool =True) -> dict:
-
-        """
-        Returns player's Win/Draw/Loss statistics by opening.
-
-        Parameters:
-            detailed (bool): Specifies the level of detail for the statistics.
-            - If True, different variants of the same opening are treated as separate entries.
-            - If False, all variants of the same opening are aggregated into one entry..
-        """
-
-        d = {}
-
-        with open(self.plik,'r') as plik:
-
-            for line in plik:
-
-                if f'[White "{self.name}"' in line:
-
-                    res = 0
-
-                    while '[Result ' not in line:
-                        line = next(plik)
-
-                    if '1-0' in line:
-
-                        res = 1
-
-                    elif '0-1' in line:
-
-                        res = -1
-
-                    elif '1/2-1/2' in line:
-
-                        res = 2
-
-                    while '[Opening ' not in line:
-                        line = next(plik)
-
-                    opn = line.split('"')[1]
-
-                    if detailed:
-
-                        if ':' in opn:
-                            x = opn.index(':')
-                            opn = opn[:x]
-
-
-                    if opn not in d:
-                        d[opn] = [0,0,0]
-
-                    if res == 1:
-                        d[opn][0] += 1
-
-                    elif res == -1:
-                        d[opn][2] +=1
-
-                    elif res == 2:
-
-                        d[opn][1] += 1
-
-
-                elif f'[White ' in line and self.name not in line:
-
-                    res = 0
-
-                    while '[Result ' not in line:
-                        line = next(plik)
-
-                    if '1-0' in line:
-
-                        res = -1
-
-                    elif '0-1' in line:
-
-                        res = 1
-
-                    elif '1/2-1/2' in line:
-
-                        res = 2
-
-                    while '[Opening ' not in line:
-                        line = next(plik)
-
-                    opn = line.split('"')[1]
-
-                    if detailed:
-
-                        if ':' in opn:
-                            x = opn.index(':')
-                            opn = opn[:x]
-
-
-                    if opn not in d:
-                        d[opn] = [0,0,0]
-
-                    if res == 1:
-                        d[opn][0] += 1
-
-                    elif res == -1:
-                        d[opn][2] +=1
-
-                    elif res == 2:
-
-                        d[opn][1] += 1
-
-        return d
-    
-
-    def WDL_Day(self) -> dict:
-
-        """
-        Returns player's Win/Draw/Loss statistics by day.
-        """
-
-        d = {}
-
-        with open(self.plik,'r') as plik:
-
-            for line in plik:
-
-                if f'White "{self.name}"' in line:
-
-                    res = 0
-
-                    while '[Result ' not in line:
-                        line = next(plik)
-
-                    if '1-0' in line:
-                        res = 1
-
-                    elif '0-1' in line:
-                        res = -1
-                    
-                    elif '1/2-1/2' in line:
-
-                        res = 2
-
-                    while '[UTCDate' not in line:
-                        line = next(plik)
-
-                    dat = line.split('"')[1]
-
-                    dob = datetime.datetime.strptime(dat, "%Y.%m.%d")
-
-                    day_of_week = dob.strftime("%A")
-
-                    if day_of_week not in d:
-                        d[day_of_week] = [0,0,0]
-
-                    if res == 1:
-                        d[day_of_week][0] += 1
-
-                    elif res == 2:
-                        d[day_of_week][1] += 1
-
-                    elif res == -1:
-                        d[day_of_week][2] += 1
-
-                elif f'White ' in line and self.name not in line:
-
-                    res = 0
-
-                    while '[Result ' not in line:
-                        line = next(plik)
-
-                    if '1-0' in line:
-                        res = -1
-
-                    elif '0-1' in line:
-                        res = 1
-                    
-                    elif '1/2-1/2' in line:
-
-                        res = 2
-
-                    while '[UTCDate' not in line:
-                        line = next(plik)
-
-                    dat = line.split('"')[1]
-
-                    date_obj = datetime.datetime.strptime(dat, "%Y.%m.%d")
-
-                    day_of_week = date_obj.strftime("%A")
-
-                    if day_of_week not in d:
-                        d[day_of_week] = [0,0,0]
-
-                    if res == 1:
-                        d[day_of_week][0] += 1
-
-                    elif res == 2:
-                        d[day_of_week][1] += 1
-
-                    elif res == -1:
-                        d[day_of_week][2] += 1
-
-        return d
-
-
-    def WDL_Time(self) -> dict:
-
-        """
-        Returns player's Win/Draw/Loss statistics by hour.
-
-        """
-
-        d = {}
-
-        with open(self.plik,'r') as plik:
-
-            for line in plik:
-
-                if f'[White "{self.name}"' in line:
-
-                    scr = 0
-
-                    while '[Result' not in line:
-                        line = next(plik)
-
-                    if '1-0' in line:
-                        scr = 1
-
-                    elif '0-1' in line:
-                        scr = -1
-
-                    elif '1/2-1/2' in line:
-                        scr = 2
-
-                    while '[UTCTime ' not in line:
-                        line = next(plik)
-
-                    godz = line.split('"')[1][:2]
-
-                    if godz not in d:
-                        d[godz] = [0,0,0]
-
-                    if scr == 1:
-                        d[godz][0] += 1
-
-                    elif scr == -1:
-                        d[godz][2] += 1
-
-                    elif scr == 2:
-                        d[godz][1] += 1
-
-
-
-                elif f'[White ' in line and self.name not in line:
-
-                    scr = 0
-
-                    while '[Result' not in line:
-                        line = next(plik)
-
-                    if '1-0' in line:
-                        scr = -1
-
-                    elif '0-1' in line:
-                        scr = 1
-
-                    elif '1/2-1/2' in line:
-                        scr = 2
-
-                    while '[UTCTime ' not in line:
-                        line = next(plik)
-
-                    godz = line.split('"')[1][:2]
-
-                    if godz not in d:
-                        d[godz] = [0,0,0]
-
-                    if scr == 1:
-                        d[godz][0] += 1
-
-                    elif scr == -1:
-                        d[godz][2] += 1
-
-                    elif scr == 2:
-                        d[godz][1] += 1
-                    
-
-        return d
-    
-
-    # day is split to 4 parts 
-
-    def WDL_Part(self) -> dict:
-
-        """
-        Returns player's Win/Draw/Loss statistics by time of day.
-
-        Returns:
-            dict: A dictionary containing Win/Draw/Loss statistics for each day.
-        """
-
-        morn = ['6','7','8', '9', '10', '11','12']
-        aft = ['13','14', '15', '16', '17','18']
-        eve = ['19','20','21','22','23']
-        noon = ['00','01', '02', '03', '04', '05']
-
-        d = {'Morning'  : [0,0,0], 'Afternoon' : [0,0,0], 'Evening' : [0,0,0], 'Noon' : [0,0,0]}
-
-
-        with open(self.plik, 'r') as plik:
-
-            for line in plik:
-
-                if f'[White "{self.name}' in line:
-
-                    res = 0
-
-                    while '[Result ' not in line:
-                        line=next(plik)
-
-                    if line[8:].strip().strip('[]"') == '1-0':
-
-                        res = 1
-
-                    elif line[8:].strip().strip('[]"') == '1-0' == '0-1':
-
-                        res = -1
-
-
-                    while '[UTCTime ' not in line:
-
-                        line = next(plik)
-
-                    if line.split('"')[1][:2] in morn:
-
-                        if res == 1:
-
-                            d['Morning'][0] += 1
-
-                        elif res == -1:
-
-                            d['Morning'][2] += 1
-
-                        elif res == 0:
-
-                            d['Morning'][1] += 1
-
-
-                    elif line.split('"')[1][:2] in aft:
-
-                        if res == 1:
-
-                            d['Afternoon'][0] += 1
-
-                        elif res == -1:
-
-                            d['Afternoon'][2] += 1
-
-                        elif res == 0:
-
-                            d['Afternoon'][1] += 1
-
-
-                    elif line.split('"')[1][:2] in eve:
-
-                        if res == 1:
-
-                            d['Evening'][0] += 1
-
-                        elif res == -1:
-
-                            d['Evening'][2] += 1
-
-                        elif res == 0:
-
-                            d['Evening'][1] += 1
-    
-
-                    elif line.split('"')[1][:2] in noon:
-
-                        if res == 1:
-
-                            d['Noon'][0] += 1
-
-                        elif res == -1:
-
-                            d['Noon'][2] += 1
-
-                        elif res == 0:
-
-                            d['Noon'][1] += 1
-
-
-
-                if f'[Black "{self.name}' in line:
-
-                    res = 0
-
-                    while '[Result ' not in line:
-                        line=next(plik)
-
-                    if line[8:].strip().strip('[]"') == '0-1':
-
-                        res = 1
-
-                    elif line[8:].strip().strip('[]"') == '1-0':
-
-                        res = -1
-
-
-                    while '[UTCTime ' not in line:
-
-                        line = next(plik)
-
-                    if line.split('"')[1][:2] in morn:
-
-                        if res == 1:
-
-                            d['Morning'][0] += 1
-
-                        elif res == -1:
-
-                            d['Morning'][2] += 1
-
-                        elif res == 0:
-
-                            d['Morning'][1] += 1
-
-
-                    elif line.split('"')[1][:2] in aft:
-
-                        if res == 1:
-
-                            d['Afternoon'][0] += 1
-
-                        elif res == -1:
-
-                            d['Afternoon'][2] += 1
-
-                        elif res == 0:
-
-                            d['Afternoon'][1] += 1
-
-
-                    elif line.split('"')[1][:2] in eve:
-
-                        if res == 1:
-
-                            d['Evening'][0] += 1
-
-                        elif res == -1:
-
-                            d['Evening'][2] += 1
-
-                        elif res == 0:
-
-                            d['Evening'][1] += 1
-    
-
-                    elif line.split('"')[1][:2] in noon:
-
-                        if res == 1:
-
-                            d['Noon'][0] += 1
-
-                        elif res == -1:
-
-                            d['Noon'][2] += 1
-
-                        elif res == 0:
-
-                            d['Noon'][1] += 1
-                    
-
-                    
-        return d
-
-
-
-
-
-    def WDL_Date(self) -> dict:
-
-        """
-        Returns player's Win/Draw/Loss statistics by date.
-
-        """
-
-
-        d = {}
-
-        if True:
-
-            with open(self.plik,'r') as plik:
+            with open(self.inst.plik,'r') as plik:
 
                 for line in plik:
 
-                    if f'[White "{self.name}' in line:
+                    if f'[White "{self.inst.name}"' in line:
+
+                        while '1. ' not in line:
+                            line = next(plik)
+
+                        l.append(line)
+
+            return l
+        
+
+        def blackpc_games(self) -> list:
+
+            """
+            Returns games played by player with black pieces.
+            
+            """
+
+            l = []
+
+            with open(self.inst.plik,'r') as plik:
+
+                for line in plik:
+
+                    if f'[Black "{self.inst.name}"' in line:
+
+                        while '1. ' not in line:
+                            line = next(plik)
+
+                        l.append(line)
+
+            return l
+        
+
+        def games_opening(self, opening) -> list:
+            """
+            Returns games played by player after certain opening.
+
+            Args:
+
+                opening:
+
+                    Name of the certain opening.
+            
+            """
+
+            l = []
+
+            with open (self.inst.plik, 'r') as plik:
+
+                for line in plik:
+
+                    if '[Opening ' in line and opening in line:
+
+                        while '1. ' not in line:
+                            line = next(plik)
+
+                        l.append(line)
+
+            return l
+        
+
+        def games_date(self, data) -> list:
+            """
+            Returns games played by player on certain date.
+
+            Args:
+
+                data:
+
+                    Exact date you want to get games from, must be passed in yyyy/mm/dd [ISO 8601 standard].
+            
+            """
+
+            l = []
+
+            with open(self.inst.plik, 'r') as plik:
+
+                for line in plik:
+
+                    if '[UTCDate' in line:
+
+                        if line.split('"')[1] == data:
+
+                            while '1. ' not in line:
+                                line = next(plik)
+
+                            l.append(line)
+
+            return l
+
+
+
+
+
+
+    class __Openings:
+
+        def __init__(self, inst):
+            self.inst = inst
+
+        def detailed(self) -> dict:
+            """
+            Returns dictionary with names of openings as keys and their frequency in file as values. Different variants of the same opening
+            are treated distincly.
+
+            """
+
+            d = {}
+
+            with open(self.inst.plik, 'r') as plik:
+
+                for line in plik:
+
+                    if '[Opening ' in line:
+
+                        opn = line.split('"')[1]
+
+                        if opn not in d:
+                            d[opn] = 0
+
+                        d[opn] += 1
+
+            if len(d) == 0:
+                return 'No opening was found :('
+            
+            return d
+
+
+
+        def not_detailed(self) -> dict:
+            """
+            Returns frequency of not detailed openings. 'Nimzo-Larsen Attack: XYZ variation' is treated same as 'Nimzo-Larsen Attack' and 
+            'Nimzo-Larsen Attack: WZK'.
+
+            """
+
+            d = {}
+
+            with open(self.inst.plik,'r') as plik:
+
+                for line in plik:
+
+                    if '[Opening' in line:
+
+                        op = line.split('"')[1]
+
+                        if ':' in op:
+
+                            idx = op.index(':')
+
+                            op = op[:idx]
+
+                        if op not in d:
+                            d[op] = 0
+
+                        d[op] += 1
+
+            if len(d) == 0:
+                return 'No opening was found :( )'
+
+            return d
+    
+
+        def starting_squares(self) -> dict:
+            """
+            Returns board coordinates of first moves.
+
+            """
+
+            d = {}
+
+            gry = CA.pure_moves(self)
+
+            gry = [' '.join([el for el in gra.split() if not el.endswith('.')]) for gra in gry]
+
+            gry = [gra.replace('1-0', '').replace('0-1', '').replace('1/2-1/2', '') for gra in gry]
+
+
+            for el in gry:
+
+                if len(el.split()) > 0:
+
+                    pierszy = el.split()[0]
+
+                if pierszy not in d:
+                    d[pierszy] = 0
+
+                d[pierszy] += 1
+
+
+            if len(d) == 0:
+                return 'No starting square was found :('
+
+            return d
+        
+
+        def eco(self) -> dict:
+            """
+            Returns dictionary containing ECO codes and their frequencies.
+            """
+
+            d = {}
+
+
+            with open(self.inst.plik,'r') as plik:
+
+                for line in plik:
+
+                    if '[ECO ' in line:
+
+                        eco = line.split('"')[1][0]
+
+                        if eco not in d:
+                            d[eco] = 0
+
+                        d[eco] += 1
+
+            if len(d) == 0:
+                return 'No ECO was found in file :( '
+
+            return d
+    
+
+        def white(self) -> dict:
+            """
+            Returns count of openings played by player with white pieces.
+            """
+            
+            d = {}
+
+            with open(self.inst.plik, 'r') as plik:
+
+                for line in plik:
+
+                    if f'[White "{self.inst.name}"' in line:
+
+                        while '[Opening ' not in line:
+                            line = next(plik)
+
+                        opn = line.split('"')[1]
+
+                        if opn not in d:
+                            d[opn] = 0
+
+                        d[opn] += 1
+            
+            return d
+
+
+        def black(self) -> dict:
+            """
+            Returns count of openings played by player with white pieces.
+            """
+            
+            d = {}
+
+            with open(self.inst.plik, 'r') as plik:
+
+                for line in plik:
+
+                    if f'[Black "{self.inst.name}"' in line:
+
+                        while '[Opening ' not in line:
+                            line = next(plik)
+
+                        opn = line.split('"')[1]
+
+                        if opn not in d:
+                            d[opn] = 0
+
+                        d[opn] += 1
+            
+            return d
+        
+        
+    class WDL:
+        
+        def __init__(self, inst):
+            self.inst = inst
+
+        def total(self) -> dict:
+            """
+            Returns player's Win/Draw/Loss stats.
+            """
+
+
+            win,loss,draw = 0,0,0
+
+            with open(self.inst.plik, 'r') as plik:
+
+                for line in plik:
+
+                    if f'[White "{self.inst.name}"' in line:
+
+                        while '[Result' not in line:
+                            line = next(plik)
+
+                        if '[Result "1-0"]' in line:
+
+                            win += 1
+
+                        elif '[Result "0-1"]' in line:
+
+                            loss += 1
+
+                        elif '[Result "1/2-1/2"]' in line:
+                            draw += 1
+
+
+                    elif f'[Black "{self.inst.name}"' in line:
+
+                        while '[Result' not in line:
+                            line = next(plik)
+
+                        if '[Result "1-0"]' in line:
+
+                            loss += 1
+
+                        elif '[Result "0-1"]' in line:
+                            win += 1
+
+                        elif '[Result "1/2-1/2"]' in line:
+                            draw += 1
+                            
+
+                return win,draw,loss
+
+
+    # detailed set to False treats Nimzo-Larssen Attack and Nimzo-Larssen Attack : Classical Variation like 2 different openings, while detailed=True thinks that they're the same :)
+
+        def openings(self, detailed: bool =True) -> dict:
+
+            """
+            Returns player's Win/Draw/Loss statistics by opening.
+
+            Parameters:
+                detailed (bool): Specifies the level of detail for the statistics.
+                - If True, different variants of the same opening are treated as separate entries.
+                - If False, all variants of the same opening are aggregated into one entry..
+            """
+
+            d = {}
+
+            with open(self.inst.plik,'r') as plik:
+
+                for line in plik:
+
+                    if f'[White "{self.inst.name}"' in line:
+
+                        res = 0
+
+                        while '[Result ' not in line:
+                            line = next(plik)
+
+                        if '1-0' in line:
+
+                            res = 1
+
+                        elif '0-1' in line:
+
+                            res = -1
+
+                        elif '1/2-1/2' in line:
+
+                            res = 2
+
+                        while '[Opening ' not in line:
+                            line = next(plik)
+
+                        opn = line.split('"')[1]
+
+                        if detailed:
+
+                            if ':' in opn:
+                                x = opn.index(':')
+                                opn = opn[:x]
+
+
+                        if opn not in d:
+                            d[opn] = [0,0,0]
+
+                        if res == 1:
+                            d[opn][0] += 1
+
+                        elif res == -1:
+                            d[opn][2] +=1
+
+                        elif res == 2:
+
+                            d[opn][1] += 1
+
+
+                    elif f'[White ' in line and self.inst.name not in line:
+
+                        res = 0
+
+                        while '[Result ' not in line:
+                            line = next(plik)
+
+                        if '1-0' in line:
+
+                            res = -1
+
+                        elif '0-1' in line:
+
+                            res = 1
+
+                        elif '1/2-1/2' in line:
+
+                            res = 2
+
+                        while '[Opening ' not in line:
+                            line = next(plik)
+
+                        opn = line.split('"')[1]
+
+                        if detailed:
+
+                            if ':' in opn:
+                                x = opn.index(':')
+                                opn = opn[:x]
+
+
+                        if opn not in d:
+                            d[opn] = [0,0,0]
+
+                        if res == 1:
+                            d[opn][0] += 1
+
+                        elif res == -1:
+                            d[opn][2] +=1
+
+                        elif res == 2:
+
+                            d[opn][1] += 1
+
+            return d
+        
+
+        def day(self) -> dict:
+
+            """
+            Returns player's Win/Draw/Loss statistics by day.
+            """
+
+            d = {}
+
+            with open(self.inst.plik,'r') as plik:
+
+                for line in plik:
+
+                    if f'White "{self.inst.name}"' in line:
+
+                        res = 0
+
+                        while '[Result ' not in line:
+                            line = next(plik)
+
+                        if '1-0' in line:
+                            res = 1
+
+                        elif '0-1' in line:
+                            res = -1
+                        
+                        elif '1/2-1/2' in line:
+
+                            res = 2
+
+                        while '[UTCDate' not in line:
+                            line = next(plik)
+
+                        dat = line.split('"')[1]
+
+                        dob = datetime.datetime.strptime(dat, "%Y.%m.%d")
+
+                        day_of_week = dob.strftime("%A")
+
+                        if day_of_week not in d:
+                            d[day_of_week] = [0,0,0]
+
+                        if res == 1:
+                            d[day_of_week][0] += 1
+
+                        elif res == 2:
+                            d[day_of_week][1] += 1
+
+                        elif res == -1:
+                            d[day_of_week][2] += 1
+
+                    elif f'White ' in line and self.inst.name not in line:
+
+                        res = 0
+
+                        while '[Result ' not in line:
+                            line = next(plik)
+
+                        if '1-0' in line:
+                            res = -1
+
+                        elif '0-1' in line:
+                            res = 1
+                        
+                        elif '1/2-1/2' in line:
+
+                            res = 2
+
+                        while '[UTCDate' not in line:
+                            line = next(plik)
+
+                        dat = line.split('"')[1]
+
+                        date_obj = datetime.datetime.strptime(dat, "%Y.%m.%d")
+
+                        day_of_week = date_obj.strftime("%A")
+
+                        if day_of_week not in d:
+                            d[day_of_week] = [0,0,0]
+
+                        if res == 1:
+                            d[day_of_week][0] += 1
+
+                        elif res == 2:
+                            d[day_of_week][1] += 1
+
+                        elif res == -1:
+                            d[day_of_week][2] += 1
+
+            return d
+
+
+        def time(self) -> dict:
+
+            """
+            Returns player's Win/Draw/Loss statistics by hour.
+
+            """
+
+            d = {}
+
+            with open(self.inst.plik,'r') as plik:
+
+                for line in plik:
+
+                    if f'[White "{self.inst.name}"' in line:
+
+                        scr = 0
+
+                        while '[Result' not in line:
+                            line = next(plik)
+
+                        if '1-0' in line:
+                            scr = 1
+
+                        elif '0-1' in line:
+                            scr = -1
+
+                        elif '1/2-1/2' in line:
+                            scr = 2
+
+                        while '[UTCTime ' not in line:
+                            line = next(plik)
+
+                        godz = line.split('"')[1][:2]
+
+                        if godz not in d:
+                            d[godz] = [0,0,0]
+
+                        if scr == 1:
+                            d[godz][0] += 1
+
+                        elif scr == -1:
+                            d[godz][2] += 1
+
+                        elif scr == 2:
+                            d[godz][1] += 1
+
+
+
+                    elif f'[White ' in line and self.inst.name not in line:
+
+                        scr = 0
+
+                        while '[Result' not in line:
+                            line = next(plik)
+
+                        if '1-0' in line:
+                            scr = -1
+
+                        elif '0-1' in line:
+                            scr = 1
+
+                        elif '1/2-1/2' in line:
+                            scr = 2
+
+                        while '[UTCTime ' not in line:
+                            line = next(plik)
+
+                        godz = line.split('"')[1][:2]
+
+                        if godz not in d:
+                            d[godz] = [0,0,0]
+
+                        if scr == 1:
+                            d[godz][0] += 1
+
+                        elif scr == -1:
+                            d[godz][2] += 1
+
+                        elif scr == 2:
+                            d[godz][1] += 1
+                        
+
+            return d
+        
+
+        # day is split to 4 parts 
+
+        def part_day(self) -> dict:
+
+            """
+            Returns player's Win/Draw/Loss statistics by time of day.
+
+            Returns:
+                dict: A dictionary containing Win/Draw/Loss statistics for each day.
+            """
+
+            morn = ['6','7','8', '9', '10', '11','12']
+            aft = ['13','14', '15', '16', '17','18']
+            eve = ['19','20','21','22','23']
+            noon = ['00','01', '02', '03', '04', '05']
+
+            d = {'Morning'  : [0,0,0], 'Afternoon' : [0,0,0], 'Evening' : [0,0,0], 'Noon' : [0,0,0]}
+
+
+            with open(self.inst.plik, 'r') as plik:
+
+                for line in plik:
+
+                    if f'[White "{self.inst.name}' in line:
 
                         res = 0
 
                         while '[Result ' not in line:
                             line=next(plik)
 
-                        if line.split('"')[1] == '1-0':
+                        if line[8:].strip().strip('[]"') == '1-0':
 
                             res = 1
 
-                        elif line.split('"')[1] == '0-1':
+                        elif line[8:].strip().strip('[]"') == '1-0' == '0-1':
 
                             res = -1
 
-                        elif line.split('"')[1] == '1/2-1/2':
-                            res = 0
 
-                        
-                        while '[UTCDate ' not in line:
+                        while '[UTCTime ' not in line:
+
                             line = next(plik)
 
-                        cho = line.split('"')[1]
+                        if line.split('"')[1][:2] in morn:
 
-                        if cho not in d:
-                            d[cho] = [0, 0, 0]
+                            if res == 1:
 
-                        if res == 1:
-                            d[cho][0] += 1
-                        elif res == -1:
-                            d[cho][2] += 1
-                        elif res == 0:
-                            d[cho][1] += 1
+                                d['Morning'][0] += 1
 
-                    elif f'[Black "{self.name}' in line:
+                            elif res == -1:
+
+                                d['Morning'][2] += 1
+
+                            elif res == 0:
+
+                                d['Morning'][1] += 1
+
+
+                        elif line.split('"')[1][:2] in aft:
+
+                            if res == 1:
+
+                                d['Afternoon'][0] += 1
+
+                            elif res == -1:
+
+                                d['Afternoon'][2] += 1
+
+                            elif res == 0:
+
+                                d['Afternoon'][1] += 1
+
+
+                        elif line.split('"')[1][:2] in eve:
+
+                            if res == 1:
+
+                                d['Evening'][0] += 1
+
+                            elif res == -1:
+
+                                d['Evening'][2] += 1
+
+                            elif res == 0:
+
+                                d['Evening'][1] += 1
+        
+
+                        elif line.split('"')[1][:2] in noon:
+
+                            if res == 1:
+
+                                d['Noon'][0] += 1
+
+                            elif res == -1:
+
+                                d['Noon'][2] += 1
+
+                            elif res == 0:
+
+                                d['Noon'][1] += 1
+
+
+
+                    if f'[Black "{self.inst.name}' in line:
 
                         res = 0
 
                         while '[Result ' not in line:
                             line=next(plik)
 
-                        if line.split('"')[1] == '1-0':
-
-                            res = -1
-
-                        elif line.split('"')[1] == '0-1':
+                        if line[8:].strip().strip('[]"') == '0-1':
 
                             res = 1
 
-                        elif line.split('"')[1] == '1/2/-1/2':
-                            res = 0
+                        elif line[8:].strip().strip('[]"') == '1-0':
+
+                            res = -1
 
 
-                        
-                        while '[UTCDate ' not in line:
+                        while '[UTCTime ' not in line:
+
                             line = next(plik)
 
-                        cho = line.split('"')[1]
+                        if line.split('"')[1][:2] in morn:
 
-                        if cho not in d:
-                            d[cho] = [0, 0, 0]
+                            if res == 1:
 
-                        if res == 1:
-                            d[cho][0] += 1
-                        elif res == -1:
-                            d[cho][2] += 1
-                        elif res == 0:
-                            d[cho][1] += 1
+                                d['Morning'][0] += 1
 
+                            elif res == -1:
 
-        return d
+                                d['Morning'][2] += 1
 
+                            elif res == 0:
+
+                                d['Morning'][1] += 1
 
 
-    def WDL_accurate_elo(self, elo : int, roundz : bool =True) -> list:
+                        elif line.split('"')[1][:2] in aft:
 
-        """
-        Returns player's Win/Draw/Loss statistics against opponents with specific elo ratings.
+                            if res == 1:
 
-        Params:
-            elo (int): A integer specifying range of the elo. Range is set by default to (elo, elo+99).
-                           
-            roundz (bool): Declaration of rounding elo to nearest 100. If set to True, f.e if elo var is 1630, the range becomes
-            (1600,1699). If set to False, range becomes (1630,1729)
+                                d['Afternoon'][0] += 1
 
-        """
+                            elif res == -1:
 
-    
+                                d['Afternoon'][2] += 1
 
-        if True:
+                            elif res == 0:
 
-            if roundz:
+                                d['Afternoon'][1] += 1
 
-                elo1 = round(elo, -2)
 
-            if not roundz:
+                        elif line.split('"')[1][:2] in eve:
 
-                elo1 = elo
+                            if res == 1:
 
-            elo2 = elo1 + 99
+                                d['Evening'][0] += 1
 
-            l = [0,0,0]
+                            elif res == -1:
 
-            with open (self.plik, 'r') as plik:
+                                d['Evening'][2] += 1
+
+                            elif res == 0:
+
+                                d['Evening'][1] += 1
+        
+
+                        elif line.split('"')[1][:2] in noon:
+
+                            if res == 1:
+
+                                d['Noon'][0] += 1
+
+                            elif res == -1:
+
+                                d['Noon'][2] += 1
+
+                            elif res == 0:
+
+                                d['Noon'][1] += 1
+                        
+
+                        
+            return d
+
+
+
+
+
+        def date(self) -> dict:
+
+            """
+            Returns player's Win/Draw/Loss statistics by date.
+
+            """
+
+
+            d = {}
+
+            if True:
+
+                with open(self.inst.plik,'r') as plik:
+
+                    for line in plik:
+
+                        if f'[White "{self.inst.name}' in line:
+
+                            res = 0
+
+                            while '[Result ' not in line:
+                                line=next(plik)
+
+                            if line.split('"')[1] == '1-0':
+
+                                res = 1
+
+                            elif line.split('"')[1] == '0-1':
+
+                                res = -1
+
+                            elif line.split('"')[1] == '1/2-1/2':
+                                res = 0
+
+                            
+                            while '[UTCDate ' not in line:
+                                line = next(plik)
+
+                            cho = line.split('"')[1]
+
+                            if cho not in d:
+                                d[cho] = [0, 0, 0]
+
+                            if res == 1:
+                                d[cho][0] += 1
+                            elif res == -1:
+                                d[cho][2] += 1
+                            elif res == 0:
+                                d[cho][1] += 1
+
+                        elif f'[Black "{self.inst.name}' in line:
+
+                            res = 0
+
+                            while '[Result ' not in line:
+                                line=next(plik)
+
+                            if line.split('"')[1] == '1-0':
+
+                                res = -1
+
+                            elif line.split('"')[1] == '0-1':
+
+                                res = 1
+
+                            elif line.split('"')[1] == '1/2/-1/2':
+                                res = 0
+
+
+                            
+                            while '[UTCDate ' not in line:
+                                line = next(plik)
+
+                            cho = line.split('"')[1]
+
+                            if cho not in d:
+                                d[cho] = [0, 0, 0]
+
+                            if res == 1:
+                                d[cho][0] += 1
+                            elif res == -1:
+                                d[cho][2] += 1
+                            elif res == 0:
+                                d[cho][1] += 1
+
+
+            return d
+
+
+
+        def accurate_elo(self, elo : int, roundz : bool =True) -> list:
+
+            """
+            Returns player's Win/Draw/Loss statistics against opponents with specific elo ratings.
+
+            Params:
+                elo (int): A integer specifying range of the elo. Range is set by default to (elo, elo+99).
+                            
+                roundz (bool): Declaration of rounding elo to nearest 100. If set to True, f.e if elo var is 1630, the range becomes
+                (1600,1699). If set to False, range becomes (1630,1729)
+
+            """
+
+        
+
+            if True:
+
+                if roundz:
+
+                    elo1 = round(elo, -2)
+
+                if not roundz:
+
+                    elo1 = elo
+
+                elo2 = elo1 + 99
+
+                l = [0,0,0]
+
+                with open (self.inst.plik, 'r') as plik:
+
+                    for line in plik:
+
+                        if f'[White "{self.inst.name}"' in line:
+
+                            while '[Result ' not in line:
+                                line = next(plik)
+
+                            res = 0
+
+                            if '1-0' in line:
+                                res = 1
+
+                            elif '0-1' in line:
+                                res = -1
+
+                            elif '1/2-1/2' in line:
+                                res = 2
+
+                            while '[BlackElo ' not in line:
+                                line = next(plik)
+
+                            if '?' not in line:
+
+                                if int(line.split('"')[1]) >= elo1 and int(line.split('"')[1]) < elo2:
+
+                                    if res == 1:
+                                        l[0] += 1
+
+                                    elif res == -1:
+                                        l[2] += 1
+
+                                    elif res == 2:
+                                        l[1] += 1
+
+                        elif f'[Black "{self.inst.name}"' in line:
+
+                            while '[Result ' not in line:
+                                line = next(plik)
+
+                            res = 0
+
+                            if '0-1' in line:
+                                res = 1
+
+                            elif '1-0' in line:
+                                res = -1
+
+                            elif '1/2-1/2' in line:
+                                res = 2
+
+                            while '[WhiteElo ' not in line:
+                                line = next(plik)
+
+                            if '?' not in line:
+
+                                if int(line.split('"')[1]) >= elo1 and int(line.split('"')[1]) < elo2:
+
+                                    if res == 1:
+                                        l[0] += 1
+
+                                    elif res == -1:
+                                        l[2] += 1
+
+                                    elif res == 2:
+                                        l[1] += 1
+
+
+                return elo1,l
+
+
+
+
+        def opponents(self, amount : int =None) -> dict:
+
+            """
+            Returns player's Win/Draw/Loss statistics against opponents.
+
+            Params:
+            amount (int, optional): The number of opponents to display in the dictionary. 
+            If None, all opponents are included. This helps to limit the length of the dictionary.
+            """
+
+            d = {}
+
+            with open(self.inst.plik, 'r') as plik:
 
                 for line in plik:
 
-                    if f'[White "{self.name}"' in line:
+                    if f'[White "{self.inst.name}"' in line:
+                        
+                        while '[Black "' not in line:
+                            line = next(plik)
+
+                        op, wyn = line.split('"')[1], 0
+
+                        while '[Result ' not in line:
+                            line = next(plik)
+
+                        if '1-0' in line:
+                            wyn = 1
+
+                        elif '0-1' in line:
+                            wyn = -1
+
+                        elif '1/2-1/2' in line:
+                            wyn = 2
+
+                        if op not in d:
+                            d[op] = [0,0,0]
+
+                        if wyn ==1:
+                            d[op][0] += 1
+
+                        elif wyn == -1:
+                            d[op][2] +=1
+
+                        elif wyn == 2:
+                            d[op][1] += 1
+
+
+                    elif f'[White "' in line and self.inst.name not in line:
+
+                        op, wyn = line.split('"')[1], 0
+
+                        while '[Result ' not in line:
+                            line = next(plik)
+
+                        if '0-1' in line:
+                            wyn = 1
+
+                        elif '1-0' in line:
+                            wyn = -1
+
+                        elif '1/2-1/2' in line:
+                            wyn = 2
+
+                        if op not in d:
+                            d[op] = [0,0,0]
+
+                        if wyn ==1:
+                            d[op][0] += 1
+
+                        elif wyn == -1:
+                            d[op][2] +=1
+
+                        elif wyn == 2:
+                            d[op][1] += 1
+
+
+            return dict(sorted(d.items(), key=lambda item: item[1][0], reverse=True)[:amount]) if amount else d
+
+
+
+
+        def elo(self) -> dict:
+
+            """
+            Returns player's Win/Draw/Loss statistics in 100-point Elo ranges.
+
+            """
+
+            d = {}
+
+            with open (self.inst.plik, 'r') as plik:
+
+                for line in plik:
+
+                    if f'[White "{self.inst.name}' in line:
 
                         while '[Result ' not in line:
                             line = next(plik)
@@ -1211,18 +1409,21 @@ class CA:
 
                         if '?' not in line:
 
-                            if int(line.split('"')[1]) >= elo1 and int(line.split('"')[1]) < elo2:
+                            elo = round(int(line.split('"')[1]),-2)
 
-                                if res == 1:
-                                    l[0] += 1
+                        if elo not in d:
+                            d[elo] = [0,0,0]
 
-                                elif res == -1:
-                                    l[2] += 1
+                        if res == 1:
+                            d[elo][0] += 1
 
-                                elif res == 2:
-                                    l[1] += 1
+                        elif res == 2:
+                            d[elo][1] += 1
 
-                    elif f'[Black "{self.name}"' in line:
+                        elif res == -1:
+                            d[elo][2] += 1
+
+                    elif f'[White "' in line and self.inst.name not in line:
 
                         while '[Result ' not in line:
                             line = next(plik)
@@ -1243,1460 +1444,1206 @@ class CA:
 
                         if '?' not in line:
 
-                            if int(line.split('"')[1]) >= elo1 and int(line.split('"')[1]) < elo2:
+                            elo = round(int(line.split('"')[1]),-2)
 
-                                if res == 1:
-                                    l[0] += 1
+                        if elo not in d:
+                            d[elo] = [0,0,0]
 
-                                elif res == -1:
-                                    l[2] += 1
+                        if res == 1:
+                            d[elo][0] += 1
 
-                                elif res == 2:
-                                    l[1] += 1
+                        elif res == 2:
+                            d[elo][1] += 1
 
-
-            return elo1,l
-
-
+                        elif res == -1:
+                            d[elo][2] += 1
 
 
-    def WDL_opponent(self, amount : int =None) -> dict:
+            return d
 
-        """
-        Returns player's Win/Draw/Loss statistics against opponents.
 
-        Params:
-        amount (int, optional): The number of opponents to display in the dictionary. 
-        If None, all opponents are included. This helps to limit the length of the dictionary.
-        """
 
-        d = {}
 
-        with open(self.plik, 'r') as plik:
+                        
+        def time_control(self) -> dict:
 
-            for line in plik:
+            '''
+            Returns player's Win/Draw/Loss based on time control.
+            '''
 
-                if f'[White "{self.name}"' in line:
+            d = {}
+
+            with open(self.inst.plik, 'r') as plik:
+
+                for line in plik:
+
+                    if f'[White "{self.inst.name}"' in line:
+
+                        while '[Result ' not in line:
+                            line = next(plik)
+
+                        res = 0
+
+                        if line.split('"')[1] == '1-0':
+                            res += 1
+
+                        elif line.split('"')[1] == '0-1':
+                            res -= 1
+
+                        elif line.split('"')[1] == '1/2-1/2':
+                            res = 69
+
+                        while '[TimeControl ' not in line:
+                            line = next(plik)
+
+                        czas =  line.split('"')[1] 
+
+                        if czas not in d:
+                            d[czas] = [0,0,0]
+
+                        if res == 1:
+                            d[czas][0] += 1
+
+                        elif res == -1:
+                            d[czas][2] += 1
+
+                        elif res == 69:
+                            d[czas][1] += 1
+
+                    if f'[White "' in line and self.inst.name not in line:
+
+                        while '[Result ' not in line:
+                            line = next(plik)
+
+                        res = 0
+
+                        if line.split('"')[1] == '1-0':
+                            res -= 1
+
+                        elif line.split('"')[1] == '0-1':
+                            res += 1
+
+                        elif line.split('"')[1] == '1/2-1/2':
+                            res = 69
+
+                        while '[TimeControl ' not in line:
+                            line = next(plik)
+
+                        czas =  line.split('"')[1] 
+
+                        if czas not in d:
+                            d[czas] = [0,0,0]
+
+                        if res == 1:
+                            d[czas][0] += 1
+
+                        elif res == -1:
+                            d[czas][2] += 1
+
+                        elif res == 69:
+                            d[czas][1] += 1
+
+
+
+            return d
+        
+
+
+        def variant(self) -> dict:
+
+            '''
+            Returns player's Win/Draw/Loss based on variant.
+            '''
+
+            d = {}
+
+            with open(self.inst.plik, 'r') as plik:
+
+                for line in plik:
+
+                    if f'[White "{self.inst.name}"' in line:
+
+                        while '[Result ' not in line:
+                            line = next(plik)
+
+                        res = 0
+
+                        if line.split('"')[1] == '1-0':
+                            res += 1
+
+                        elif line.split('"')[1] == '0-1':
+                            res -= 1
+
+                        elif line.split('"')[1] == '1/2-1/2':
+                            res = 69
+
+                        while '[Variant ' not in line:
+                            line = next(plik)
+
+                        war =  line.split('"')[1] 
+
+                        if war not in d:
+                            d[war] = [0,0,0]
+
+                        if res == 1:
+                            d[war][0] += 1
+
+                        elif res == -1:
+                            d[war][2] += 1
+
+                        elif res == 69:
+                            d[war][1] += 1
+
+                    if f'[White "' in line and self.inst.name not in line:
+
+                        while '[Result ' not in line:
+                            line = next(plik)
+
+                        res = 0
+
+                        if line.split('"')[1] == '1-0':
+                            res -= 1
+
+                        elif line.split('"')[1] == '0-1':
+                            res += 1
+
+                        elif line.split('"')[1] == '1/2-1/2':
+                            res = 69
+
+                        while '[Variant ' not in line:
+                            line = next(plik)
+
+                        war =  line.split('"')[1] 
+
+                        if war not in d:
+                            d[war] = [0,0,0]
+
+                        if res == 1:
+                            d[war][0] += 1
+
+                        elif res == -1:
+                            d[war][2] += 1
+
+                        elif res == 69:
+                            d[war][1] += 1
+
+
+
+            return d
+
+
+        def gametype(self) -> dict:
+            '''
+            Returns player's Win/Draw/Loss based on time gamr type [blitz, bullet, rapid].
+            '''
+
+
+            d = {}
+
+            with open(self.inst.plik, 'r') as plik:
+
+                for line in plik:
                     
-                    while '[Black "' not in line:
-                        line = next(plik)
+                    if '[Event ' in line:
 
-                    op, wyn = line.split('"')[1], 0
+                        lin = line.split('"')[1]                       #zloty lin wita krola
 
-                    while '[Result ' not in line:
-                        line = next(plik)
+                        gt = 0
 
-                    if '1-0' in line:
-                        wyn = 1
+                        if 'blitz' in lin:
+                            gt = 'blitz'
 
-                    elif '0-1' in line:
-                        wyn = -1
+                        elif 'bullet' in lin:
+                            gt = 'bullet'
 
-                    elif '1/2-1/2' in line:
-                        wyn = 2
+                        elif 'rapid' in lin:
+                            gt = 'rapid'
 
-                    if op not in d:
-                        d[op] = [0,0,0]
+                        while '[White "' not in line:
+                            line = next(plik)
 
-                    if wyn ==1:
-                        d[op][0] += 1
+                        if self.inst.name in line:
 
-                    elif wyn == -1:
-                        d[op][2] +=1
+                            while '[Result ' not in line:
+                                line = next(plik)
 
-                    elif wyn == 2:
-                        d[op][1] += 1
+                            res = 0
 
+                            ln = line.split('"')[1]
 
-                elif f'[White "' in line and self.name not in line:
+                            if ln == '1-0':
+                                res += 1
 
-                    op, wyn = line.split('"')[1], 0
+                            elif ln == '0-1':
+                                res -=1
 
-                    while '[Result ' not in line:
-                        line = next(plik)
+                            elif ln == '1/2-1/2':
+                                res = 1738
 
-                    if '0-1' in line:
-                        wyn = 1
+                            if gt not in d:
+                                d[gt] = [0,0,0]
 
-                    elif '1-0' in line:
-                        wyn = -1
+                            if res==1:
+                                d[gt][0] += 1
 
-                    elif '1/2-1/2' in line:
-                        wyn = 2
+                            elif res == -1:
+                                d[gt][2] += 1
 
-                    if op not in d:
-                        d[op] = [0,0,0]
+                            elif res == 1738:
+                                d[gt][1] += 1
 
-                    if wyn ==1:
-                        d[op][0] += 1
+                        elif self.inst.name not in line:
 
-                    elif wyn == -1:
-                        d[op][2] +=1
+                            while '[Result ' not in line:
+                                line = next(plik)
 
-                    elif wyn == 2:
-                        d[op][1] += 1
+                            res = 0
 
+                            ln = line.split('"')[1]
 
-        return dict(sorted(d.items(), key=lambda item: item[1][0], reverse=True)[:amount]) if amount else d
+                            if ln == '0-1':
+                                res += 1
 
+                            elif ln == '1-0':
+                                res -=1
 
+                            elif ln == '1/2-1/2':
+                                res = 1738
 
+                            if gt not in d:
+                                d[gt] = [0,0,0]
 
-    def WDL_elo(self) -> dict:
+                            if res==1:
+                                d[gt][0] += 1
 
-        """
-        Returns player's Win/Draw/Loss statistics in 100-point Elo ranges.
+                            elif res == -1:
+                                d[gt][2] += 1
 
-        """
-
-        d = {}
-
-        with open (self.plik, 'r') as plik:
-
-            for line in plik:
-
-                if f'[White "{self.name}' in line:
-
-                    while '[Result ' not in line:
-                        line = next(plik)
-
-                    res = 0
-
-                    if '1-0' in line:
-                        res = 1
-
-                    elif '0-1' in line:
-                        res = -1
-
-                    elif '1/2-1/2' in line:
-                        res = 2
-
-                    while '[BlackElo ' not in line:
-                        line = next(plik)
-
-                    if '?' not in line:
-
-                        elo = round(int(line.split('"')[1]),-2)
-
-                    if elo not in d:
-                        d[elo] = [0,0,0]
-
-                    if res == 1:
-                        d[elo][0] += 1
-
-                    elif res == 2:
-                        d[elo][1] += 1
-
-                    elif res == -1:
-                        d[elo][2] += 1
-
-                elif f'[White "' in line and self.name not in line:
-
-                    while '[Result ' not in line:
-                        line = next(plik)
-
-                    res = 0
-
-                    if '0-1' in line:
-                        res = 1
-
-                    elif '1-0' in line:
-                        res = -1
-
-                    elif '1/2-1/2' in line:
-                        res = 2
-
-                    while '[WhiteElo ' not in line:
-                        line = next(plik)
-
-                    if '?' not in line:
-
-                        elo = round(int(line.split('"')[1]),-2)
-
-                    if elo not in d:
-                        d[elo] = [0,0,0]
-
-                    if res == 1:
-                        d[elo][0] += 1
-
-                    elif res == 2:
-                        d[elo][1] += 1
-
-                    elif res == -1:
-                        d[elo][2] += 1
-
-
-        return d
-
-
-
-
-                    
-    def WDL_time_control(self) -> dict:
-
-        '''
-        Returns player's Win/Draw/Loss based on time control.
-        '''
-
-        d = {}
-
-        with open(self.plik, 'r') as plik:
-
-            for line in plik:
-
-                if f'[White "{self.name}"' in line:
-
-                    while '[Result ' not in line:
-                        line = next(plik)
-
-                    res = 0
-
-                    if line.split('"')[1] == '1-0':
-                        res += 1
-
-                    elif line.split('"')[1] == '0-1':
-                        res -= 1
-
-                    elif line.split('"')[1] == '1/2-1/2':
-                        res = 69
-
-                    while '[TimeControl ' not in line:
-                        line = next(plik)
-
-                    czas =  line.split('"')[1] 
-
-                    if czas not in d:
-                        d[czas] = [0,0,0]
-
-                    if res == 1:
-                        d[czas][0] += 1
-
-                    elif res == -1:
-                        d[czas][2] += 1
-
-                    elif res == 69:
-                        d[czas][1] += 1
-
-                if f'[White "' in line and self.name not in line:
-
-                    while '[Result ' not in line:
-                        line = next(plik)
-
-                    res = 0
-
-                    if line.split('"')[1] == '1-0':
-                        res -= 1
-
-                    elif line.split('"')[1] == '0-1':
-                        res += 1
-
-                    elif line.split('"')[1] == '1/2-1/2':
-                        res = 69
-
-                    while '[TimeControl ' not in line:
-                        line = next(plik)
-
-                    czas =  line.split('"')[1] 
-
-                    if czas not in d:
-                        d[czas] = [0,0,0]
-
-                    if res == 1:
-                        d[czas][0] += 1
-
-                    elif res == -1:
-                        d[czas][2] += 1
-
-                    elif res == 69:
-                        d[czas][1] += 1
-
-
-
-        return d
+                            elif res == 1738:
+                                d[gt][1] += 1
+                            
     
+            return d
+        
+    
+    class __Player:
+
+        def __init__(self, inst):
+            self.inst = inst
+
+        class Blitz:
+            def __init__(self, inst):
+                self.inst = inst
+
+            def progress(self, reverse : bool = True) -> list:
+
+                """
+                Returns player's progress in blitz games.
+
+                Params:
+
+                    reverse (bool): Indicates if list of elo scores should be returned in reverse. By default set to True.
+
+                """
 
 
-    def WDL_variant(self) -> dict:
+                l = []
 
-        '''
-        Returns player's Win/Draw/Loss based on variant.
-        '''
+                with open (self.inst.plik, 'r') as plik:
 
-        d = {}
+                    for line in plik:
 
-        with open(self.plik, 'r') as plik:
+                        if '[Event ' in line:
 
-            for line in plik:
+                            if line.split(" ")[2] == 'blitz':
 
-                if f'[White "{self.name}"' in line:
+                                while '[White ' not in line:
+                                    line = next(plik)
 
-                    while '[Result ' not in line:
-                        line = next(plik)
+                                if f'"{self.inst.name}' in line:
 
-                    res = 0
+                                    while '[WhiteElo' not in line:
+                                        line = next(plik)
 
-                    if line.split('"')[1] == '1-0':
-                        res += 1
-
-                    elif line.split('"')[1] == '0-1':
-                        res -= 1
-
-                    elif line.split('"')[1] == '1/2-1/2':
-                        res = 69
-
-                    while '[Variant ' not in line:
-                        line = next(plik)
-
-                    war =  line.split('"')[1] 
-
-                    if war not in d:
-                        d[war] = [0,0,0]
-
-                    if res == 1:
-                        d[war][0] += 1
-
-                    elif res == -1:
-                        d[war][2] += 1
-
-                    elif res == 69:
-                        d[war][1] += 1
-
-                if f'[White "' in line and self.name not in line:
-
-                    while '[Result ' not in line:
-                        line = next(plik)
-
-                    res = 0
-
-                    if line.split('"')[1] == '1-0':
-                        res -= 1
-
-                    elif line.split('"')[1] == '0-1':
-                        res += 1
-
-                    elif line.split('"')[1] == '1/2-1/2':
-                        res = 69
-
-                    while '[Variant ' not in line:
-                        line = next(plik)
-
-                    war =  line.split('"')[1] 
-
-                    if war not in d:
-                        d[war] = [0,0,0]
-
-                    if res == 1:
-                        d[war][0] += 1
-
-                    elif res == -1:
-                        d[war][2] += 1
-
-                    elif res == 69:
-                        d[war][1] += 1
+                                    l.append(line.split('"')[1])
 
 
 
-        return d
+                                elif f'"{self.inst.name}' in next(plik):
+
+                                    while '[BlackElo' not in line:
+                                        line=next(plik)
+
+                                    l.append(line.split('"')[1])
+
+                return l[::-1] if reverse else l
+            
+
+            def progress_date(self) -> dict:
+                """
+                Returns player's gained/lost elo by date in blitz games.
+                """
+
+                d = {}
+
+                with open (self.inst.plik, 'r') as plik:
+
+                    for line in plik:
+
+                        if '[Event ' in line:
+
+                            if 'blitz' in line:
+
+                                while '[White ' not in line:
+                                    line = next(plik)
+
+                                if self.inst.name in line:
+
+                                    while '[UTCDate ' not in line:
+                                        line = next(plik)
+
+                                    cho = line.split('"')[1]
+
+                                    if cho not in d:
+                                        d[cho] = 0
+
+                                    while '[WhiteRatingDiff' not in line:
+                                        line = next(plik)
+                    
+
+                                    d[cho] += int(line.split('"')[1])
+
+                                elif self.inst.name not in line:
+
+                                    while '[UTCDate ' not in line:
+                                        line = next(plik)
+
+                                    cho = line.split('"')[1]
+
+                                    if cho not in d:
+                                        d[cho] = 0
+
+                                    while '[BlackRatingDiff' not in line:
+                                        line = next(plik)
+                    
+
+                                    d[cho] += int(line.split('"')[1])
 
 
-    def WDL_gametype(self) -> dict:
-        '''
-        Returns player's Win/Draw/Loss based on time gamr type [blitz, bullet, rapid].
-        '''
+                return d
 
 
-        d = {}
+            def progress_hour(self) -> dict:
+                """
+                Returns player's gained/lost elo determined by hour in blitz games.
+                """
 
-        with open(self.plik, 'r') as plik:
 
-            for line in plik:
+                d = {}
+
+                with open (self.inst.plik, 'r') as plik:
+
+                    for line in plik:
+
+                        if '[Event ' in line:
+
+                            if 'blitz' in line:
+
+                                while '[White ' not in line:
+                                    line = next(plik)
+
+                                if self.inst.name in line:
+
+                                    while '[UTCTime ' not in line:
+                                        line = next(plik)
+
+                                    cho = line.split('"')[1][:2]
+
+                                    if cho not in d:
+                                        d[cho] = 0
+
+                                    while '[WhiteRatingDiff' not in line:
+                                        line = next(plik)
+                    
+
+                                    d[cho] += int(line.split('"')[1])
+
+                                elif self.inst.name not in line:
+
+                                    while '[UTCTime ' not in line:
+                                        line = next(plik)
+
+                                    cho = line.split('"')[1][:2]
+
+                                    if cho not in d:
+                                        d[cho] = 0
+
+                                    while '[BlackRatingDiff' not in line:
+                                        line = next(plik)
+                    
+
+                                    d[cho] += int(line.split('"')[1])
+
+                return d
+            
+        
+        class Bullet:
+
+            def __init__(self, inst):
+                self.inst = inst
+        
+
+            def progress(self, reverse=True) -> list:
+
+                """
+                Returns player's progress in bullet games.
+
+                Params:
+
+                    reverse (bool): Indicates if list of elo scores should be returned in reverse. By default set to True.
+
+                """
+
+
+                l = []
+
+                with open (self.inst.plik, 'r') as plik:
+
+                    for line in plik:
+
+                        if '[Event ' in line:
+
+                            if 'bullet' in line:
+
+                                while '[White ' not in line:
+                                    line = next(plik)
+
+                                if f'"{self.inst.name}' in line:
+
+                                    while '[WhiteElo' not in line:
+                                        line = next(plik)
+
+                                    l.append(line[10:].strip().strip('[]"'))
+
+
+
+                                elif f'"{self.inst.name}' in next(plik):
+
+                                    while '[BlackElo' not in line:
+                                        line=next(plik)
+
+                                    l.append(line[10:].strip().strip('[]"'))
+
+                return l[::-1] if reverse else l
                 
-                if '[Event ' in line:
 
-                    lin = line.split('"')[1]                       #zloty lin wita krola
 
-                    gt = 0
 
-                    if 'blitz' in lin:
-                        gt = 'blitz'
+            def progress_date(self) -> dict:
+                """
+                Returns player's gained/lost elo by date in bullet games.
+                """
 
-                    elif 'bullet' in lin:
-                        gt = 'bullet'
 
-                    elif 'rapid' in lin:
-                        gt = 'rapid'
+                d = {}
 
-                    while '[White "' not in line:
-                        line = next(plik)
+                with open (self.inst.plik, 'r') as plik:
 
-                    if self.name in line:
+                    for line in plik:
+
+                        if '[Event ' in line:
+
+                            if 'bullet' in line:
+
+                                while '[White ' not in line:
+                                    line = next(plik)
+
+                                if self.inst.name in line:
+
+                                    while '[UTCDate ' not in line:
+                                        line = next(plik)
+
+                                    cho = line.split('"')[1]
+
+                                    if cho not in d:
+                                        d[cho] = 0
+
+                                    while '[WhiteRatingDiff' not in line:
+                                        line = next(plik)
+                    
+
+                                    d[cho] += int(line.split('"')[1])
+
+                                elif self.inst.name not in line:
+
+                                    while '[UTCDate ' not in line:
+                                        line = next(plik)
+
+                                    cho = line.split('"')[1]
+
+                                    if cho not in d:
+                                        d[cho] = 0
+
+                                    while '[BlackRatingDiff' not in line:
+                                        line = next(plik)
+                    
+
+                                    d[cho] += int(line.split('"')[1])
+
+
+                return d
+
+
+            def progress_hour(self) -> dict:
+                """
+                Returns player's gained/lost elo determined by hour in bullet games.
+                """
+
+                d = {}
+
+                with open (self.inst.plik, 'r') as plik:
+
+                    for line in plik:
+
+                        if '[Event ' in line:
+
+                            if 'bullet' in line:
+
+                                while '[White ' not in line:
+                                    line = next(plik)
+
+                                if self.inst.name in line:
+
+                                    while '[UTCTime ' not in line:
+                                        line = next(plik)
+
+                                    cho = line.split('"')[1][:2]
+
+                                    if cho not in d:
+                                        d[cho] = 0
+
+                                    while '[WhiteRatingDiff' not in line:
+                                        line = next(plik)
+                    
+
+                                    d[cho] += int(line.split('"')[1])
+
+                                elif self.inst.name not in line:
+
+                                    while '[UTCTime ' not in line:
+                                        line = next(plik)
+
+                                    cho = line.split('"')[1][:2]
+
+                                    if cho not in d:
+                                        d[cho] = 0
+
+                                    while '[BlackRatingDiff' not in line:
+                                        line = next(plik)
+                    
+
+                                    d[cho] += int(line.split('"')[1])
+
+                return d
+            
+
+
+        class Rapid:
+
+            def __init__(self, inst):
+                self.inst = inst
+
+
+            def progress(self, reverse=True) -> list:
+
+                """
+                Returns player's progress in blitz games.
+
+                Params:
+
+                    reverse (bool): Indicates if list of elo scores should be returned in reverse. By default set to True.
+
+                """
+
+
+                l = []
+
+                with open (self.inst.plik, 'r') as plik:
+
+                    for line in plik:
+
+                        if '[Event ' in line:
+
+                            if line.split(" ")[2] == 'rapid':
+
+                                while '[White ' not in line:
+                                    line = next(plik)
+
+                                if f'"{self.inst.name}' in line:
+
+                                    while '[WhiteElo' not in line:
+                                        line = next(plik)
+
+                                    l.append(line[10:].strip().strip('[]"'))
+
+
+
+                                elif f'"{self.inst.name}' in next(plik):
+
+                                    while '[BlackElo' not in line:
+                                        line=next(plik)
+
+                                    l.append(line[10:].strip().strip('[]"'))
+
+
+                return l[::-1] if reverse else l
+
+
+
+            def progress_date(self) -> dict:
+
+                """
+                Returns player's gained/lost elo by date in rapid games.
+                """
+
+
+                d = {}
+
+                with open (self.inst.plik, 'r') as plik:
+
+                    for line in plik:
+
+                        if '[Event ' in line:
+
+                            if 'rapid' in line:
+
+                                while '[White ' not in line:
+                                    line = next(plik)
+
+                                if self.inst.name in line:
+
+                                    while '[UTCDate ' not in line:
+                                        line = next(plik)
+
+                                    cho = line.split('"')[1]
+
+                                    if cho not in d:
+                                        d[cho] = 0
+
+                                    while '[WhiteRatingDiff' not in line:
+                                        line = next(plik)
+                    
+
+                                    d[cho] += int(line.split('"')[1])
+
+                                elif self.inst.name not in line:
+
+                                    while '[UTCDate ' not in line:
+                                        line = next(plik)
+
+                                    cho = line.split('"')[1]
+
+                                    if cho not in d:
+                                        d[cho] = 0
+
+                                    while '[BlackRatingDiff' not in line:
+                                        line = next(plik)
+                    
+
+                                    d[cho] += int(line.split('"')[1])
+
+
+                return d
+
+
+            def progress_hour(self) -> dict:
+                """
+                Returns player's gained/lost elo determined by hour in rapid games.
+                """
+
+                d = {}
+
+                with open (self.inst.plik, 'r') as plik:
+
+                    for line in plik:
+
+                        if '[Event ' in line:
+
+                            if 'rapid' in line:
+
+                                while '[White ' not in line:
+                                    line = next(plik)
+
+                                if self.inst.name in line:
+
+                                    while '[UTCTime ' not in line:
+                                        line = next(plik)
+
+                                    cho = line.split('"')[1][:2]
+
+                                    if cho not in d:
+                                        d[cho] = 0
+
+                                    while '[WhiteRatingDiff' not in line:
+                                        line = next(plik)
+                    
+
+                                    d[cho] += int(line.split('"')[1])
+
+                                elif self.inst.name not in line:
+
+                                    while '[UTCTime ' not in line:
+                                        line = next(plik)
+
+                                    cho = line.split('"')[1][:2]
+
+                                    if cho not in d:
+                                        d[cho] = 0
+
+                                    while '[BlackRatingDiff' not in line:
+                                        line = next(plik)
+                    
+
+                                    d[cho] += int(line.split('"')[1])
+
+                return d
+
+
+        def win_percentage_white(self):
+            '''
+            Returns player's win percentage when playing with white pieces.
+            '''
+
+            win,total = 0,0
+
+            with open(self.inst.plik,'r') as plik:
+
+                for line in plik:
+
+                    if f'[White "{self.inst.name}"' in line:
 
                         while '[Result ' not in line:
                             line = next(plik)
 
-                        res = 0
+                        if '1-0' in line:
+                            win += 1
+                            total += 1
 
-                        ln = line.split('"')[1]
+                        elif '0-1' in line or '1/2-1/2' in line:
+                            total += 1
 
-                        if ln == '1-0':
-                            res += 1
+            if total == 0:
 
-                        elif ln == '0-1':
-                            res -=1
+                return 0.00
 
-                        elif ln == '1/2-1/2':
-                            res = 1738
+            return round(win/total,3)
 
-                        if gt not in d:
-                            d[gt] = [0,0,0]
 
-                        if res==1:
-                            d[gt][0] += 1
 
-                        elif res == -1:
-                            d[gt][2] += 1
 
-                        elif res == 1738:
-                            d[gt][1] += 1
+        def win_percentage_black(self) -> int:
+            '''
+            Returns player's win percentage when playing with black pieces.
+            '''
 
-                    elif self.name not in line:
+            win,total = 0,0
+
+            with open(self.inst.plik,'r') as plik:
+
+                for line in plik:
+                        
+                    if f'[White ' in line and self.inst.name not in line:
+                            
+                        while '[Result ' not in line:
+                            line = next(plik)
+
+                        if '1-0' in line:
+                            win += 1
+                            total += 1
+
+                        elif '0-1' in line or '1/2-1/2' in line:
+                            total += 1
+
+            if total == 0:
+                return 0.00
+
+
+            return round(win/total,3)
+
+
+        def win_percentage_opponent(self, opponents_name) -> int:
+            '''
+            Returns player's win percentage determined by oponnent.
+
+            Params:
+
+            opponents_name (str): 
+            '''
+            w,t = 0,0
+
+            with open(self.inst.plik, 'r') as plik:
+
+                for line in plik:
+
+                    if f'[White "{opponents_name}' in line:
 
                         while '[Result ' not in line:
                             line = next(plik)
 
-                        res = 0
+                        if '1-0' in line:
+                            t += 1
 
-                        ln = line.split('"')[1]
+                        elif '1/2-1/2' in line:
+                            t += 1
 
-                        if ln == '0-1':
-                            res += 1
+                        elif '0-1' in line:
+                            w += 1
+                            t += 1
 
-                        elif ln == '1-0':
-                            res -=1
+                    elif f'[Black "{opponents_name}' in line:
 
-                        elif ln == '1/2-1/2':
-                            res = 1738
-
-                        if gt not in d:
-                            d[gt] = [0,0,0]
-
-                        if res==1:
-                            d[gt][0] += 1
-
-                        elif res == -1:
-                            d[gt][2] += 1
-
-                        elif res == 1738:
-                            d[gt][1] += 1
-                        
- 
-        return d
-
-
-
-
-##############                                         FUNCTIONS RELATED TO PLAYER STATS        #############
-
-
-
-
-
-    def blitz_progress(self, reverse : bool = True) -> list:
-
-        """
-        Returns player's progress in blitz games.
-
-        Params:
-
-            reverse (bool): Indicates if list of elo scores should be returned in reverse. By default set to True.
-
-        """
-
-
-        l = []
-
-        with open (self.plik, 'r') as plik:
-
-            for line in plik:
-
-                if '[Event ' in line:
-
-                    if line.split(" ")[2] == 'blitz':
-
-                        while '[White ' not in line:
+                        while '[Result ' not in line:
                             line = next(plik)
 
-                        if f'"{self.name}' in line:
+                        if '1-0' in line:
+                            w += 1
+                            t += 1
 
-                            while '[WhiteElo' not in line:
-                                line = next(plik)
+                        elif '1/2-1/2' in line:
+                            t += 1
 
-                            l.append(line.split('"')[1])
+                        elif '0-1' in line:
+                            t += 1
+
+            return round(w/t, 3)
 
 
+        def avg_opponent_elo(self) -> int:
+            '''
+            Returns average oponnent's elo.
+            '''
 
-                        elif f'"{self.name}' in next(plik):
+            elo, total = 0,0
 
-                            while '[BlackElo' not in line:
-                                line=next(plik)
+            with open(self.inst.plik, 'r') as plik:
 
-                            l.append(line.split('"')[1])
+                for line in plik:
 
-        return l[::-1] if reverse else l
+                    if f'[White "{self.inst.name}' in line:
+
+                        while '[BlackElo' not in line:
+                            line = next(plik)
+
+                        if '?' not in line:
+                            elo += int(line.split('"')[1])
+                            total += 1
+
+                    elif f'[Black "{self.inst.name}' in line:
+
+                        while '[WhiteElo' not in line:
+                            line = next(plik)
+
+
+                        if '?' not in line:
+                            elo += int(line.split('"')[1])
+                            total += 1
+
+            return round(elo/total, 3)
         
 
-    def blitz_progress_date(self) -> dict:
-        """
-        Returns player's gained/lost elo by date in blitz games.
-        """
+        def white_black_total(self) -> list:
+            '''
+            Returns player's number of games with white, black pieces and total amount of games.
+            '''
 
-        d = {}
+            w,b,t = 0,0,0
 
-        with open (self.plik, 'r') as plik:
+            with open(self.inst.plik, 'r') as plik:
 
-            for line in plik:
+                for line in plik:
 
-                if '[Event ' in line:
-
-                    if 'blitz' in line:
-
-                        while '[White ' not in line:
-                            line = next(plik)
-
-                        if self.name in line:
-
-                            while '[UTCDate ' not in line:
-                                line = next(plik)
-
-                            cho = line.split('"')[1]
-
-                            if cho not in d:
-                                d[cho] = 0
-
-                            while '[WhiteRatingDiff' not in line:
-                                line = next(plik)
-            
-
-                            d[cho] += int(line.split('"')[1])
-
-                        elif self.name not in line:
-
-                            while '[UTCDate ' not in line:
-                                line = next(plik)
-
-                            cho = line.split('"')[1]
-
-                            if cho not in d:
-                                d[cho] = 0
-
-                            while '[BlackRatingDiff' not in line:
-                                line = next(plik)
-            
-
-                            d[cho] += int(line.split('"')[1])
-
-
-        return d
-
-
-    def blitz_progress_hour(self) -> dict:
-        """
-        Returns player's gained/lost elo determined by hour in blitz games.
-        """
-
-
-        d = {}
-
-        with open (self.plik, 'r') as plik:
-
-            for line in plik:
-
-               if '[Event ' in line:
-
-                    if 'blitz' in line:
-
-                        while '[White ' not in line:
-                            line = next(plik)
-
-                        if self.name in line:
-
-                            while '[UTCTime ' not in line:
-                                line = next(plik)
-
-                            cho = line.split('"')[1][:2]
-
-                            if cho not in d:
-                                d[cho] = 0
-
-                            while '[WhiteRatingDiff' not in line:
-                                line = next(plik)
-            
-
-                            d[cho] += int(line.split('"')[1])
-
-                        elif self.name not in line:
-
-                            while '[UTCTime ' not in line:
-                                line = next(plik)
-
-                            cho = line.split('"')[1][:2]
-
-                            if cho not in d:
-                                d[cho] = 0
-
-                            while '[BlackRatingDiff' not in line:
-                                line = next(plik)
-            
-
-                            d[cho] += int(line.split('"')[1])
-
-        return d
-    
-
-
-    def bullet_progress(self, reverse=True) -> list:
-
-        """
-        Returns player's progress in bullet games.
-
-        Params:
-
-            reverse (bool): Indicates if list of elo scores should be returned in reverse. By default set to True.
-
-        """
-
-
-        l = []
-
-        with open (self.plik, 'r') as plik:
-
-            for line in plik:
-
-                if '[Event ' in line:
-
-                    if 'bullet' in line:
-
-                        while '[White ' not in line:
-                            line = next(plik)
-
-                        if f'"{self.name}' in line:
-
-                            while '[WhiteElo' not in line:
-                                line = next(plik)
-
-                            l.append(line[10:].strip().strip('[]"'))
-
-
-
-                        elif f'"{self.name}' in next(plik):
-
-                            while '[BlackElo' not in line:
-                                line=next(plik)
-
-                            l.append(line[10:].strip().strip('[]"'))
-
-        return l[::-1] if reverse else l
-        
-
-
-
-    def bullet_progress_date(self) -> dict:
-        """
-        Returns player's gained/lost elo by date in bullet games.
-        """
-
-
-        d = {}
-
-        with open (self.plik, 'r') as plik:
-
-            for line in plik:
-
-                if '[Event ' in line:
-
-                    if 'bullet' in line:
-
-                        while '[White ' not in line:
-                            line = next(plik)
-
-                        if self.name in line:
-
-                            while '[UTCDate ' not in line:
-                                line = next(plik)
-
-                            cho = line.split('"')[1]
-
-                            if cho not in d:
-                                d[cho] = 0
-
-                            while '[WhiteRatingDiff' not in line:
-                                line = next(plik)
-            
-
-                            d[cho] += int(line.split('"')[1])
-
-                        elif self.name not in line:
-
-                            while '[UTCDate ' not in line:
-                                line = next(plik)
-
-                            cho = line.split('"')[1]
-
-                            if cho not in d:
-                                d[cho] = 0
-
-                            while '[BlackRatingDiff' not in line:
-                                line = next(plik)
-            
-
-                            d[cho] += int(line.split('"')[1])
-
-
-        return d
-
-
-    def bullet_progress_hour(self) -> dict:
-        """
-        Returns player's gained/lost elo determined by hour in bullet games.
-        """
-
-        d = {}
-
-        with open (self.plik, 'r') as plik:
-
-            for line in plik:
-
-               if '[Event ' in line:
-
-                    if 'bullet' in line:
-
-                        while '[White ' not in line:
-                            line = next(plik)
-
-                        if self.name in line:
-
-                            while '[UTCTime ' not in line:
-                                line = next(plik)
-
-                            cho = line.split('"')[1][:2]
-
-                            if cho not in d:
-                                d[cho] = 0
-
-                            while '[WhiteRatingDiff' not in line:
-                                line = next(plik)
-            
-
-                            d[cho] += int(line.split('"')[1])
-
-                        elif self.name not in line:
-
-                            while '[UTCTime ' not in line:
-                                line = next(plik)
-
-                            cho = line.split('"')[1][:2]
-
-                            if cho not in d:
-                                d[cho] = 0
-
-                            while '[BlackRatingDiff' not in line:
-                                line = next(plik)
-            
-
-                            d[cho] += int(line.split('"')[1])
-
-        return d
-        
-
-
-
-
-    def rapid_progress(self, reverse=True) -> list:
-
-        """
-        Returns player's progress in blitz games.
-
-        Params:
-
-            reverse (bool): Indicates if list of elo scores should be returned in reverse. By default set to True.
-
-        """
-
-
-        l = []
-
-        with open (plik, 'r') as plik:
-
-            for line in plik:
-
-                if '[Event ' in line:
-
-                    if line.split(" ")[2] == 'rapid':
-
-                        while '[White ' not in line:
-                            line = next(plik)
-
-                        if f'"{self.name}' in line:
-
-                            while '[WhiteElo' not in line:
-                                line = next(plik)
-
-                            l.append(line[10:].strip().strip('[]"'))
-
-
-
-                        elif f'"{self.name}' in next(plik):
-
-                            while '[BlackElo' not in line:
-                                line=next(plik)
-
-                            l.append(line[10:].strip().strip('[]"'))
-
-
-        return l[::-1] if reverse else l
-
-
-
-    def rapid_progress_date(self) -> dict:
-
-        """
-        Returns player's gained/lost elo by date in rapid games.
-        """
-
-
-        d = {}
-
-        with open (self.plik, 'r') as plik:
-
-            for line in plik:
-
-                if '[Event ' in line:
-
-                    if 'rapid' in line:
-
-                        while '[White ' not in line:
-                            line = next(plik)
-
-                        if self.name in line:
-
-                            while '[UTCDate ' not in line:
-                                line = next(plik)
-
-                            cho = line.split('"')[1]
-
-                            if cho not in d:
-                                d[cho] = 0
-
-                            while '[WhiteRatingDiff' not in line:
-                                line = next(plik)
-            
-
-                            d[cho] += int(line.split('"')[1])
-
-                        elif self.name not in line:
-
-                            while '[UTCDate ' not in line:
-                                line = next(plik)
-
-                            cho = line.split('"')[1]
-
-                            if cho not in d:
-                                d[cho] = 0
-
-                            while '[BlackRatingDiff' not in line:
-                                line = next(plik)
-            
-
-                            d[cho] += int(line.split('"')[1])
-
-
-        return d
-
-
-    def rapid_progress_hour(self) -> dict:
-        """
-        Returns player's gained/lost elo determined by hour in rapid games.
-        """
-
-        d = {}
-
-        with open (self.plik, 'r') as plik:
-
-            for line in plik:
-
-               if '[Event ' in line:
-
-                    if 'rapid' in line:
-
-                        while '[White ' not in line:
-                            line = next(plik)
-
-                        if self.name in line:
-
-                            while '[UTCTime ' not in line:
-                                line = next(plik)
-
-                            cho = line.split('"')[1][:2]
-
-                            if cho not in d:
-                                d[cho] = 0
-
-                            while '[WhiteRatingDiff' not in line:
-                                line = next(plik)
-            
-
-                            d[cho] += int(line.split('"')[1])
-
-                        elif self.name not in line:
-
-                            while '[UTCTime ' not in line:
-                                line = next(plik)
-
-                            cho = line.split('"')[1][:2]
-
-                            if cho not in d:
-                                d[cho] = 0
-
-                            while '[BlackRatingDiff' not in line:
-                                line = next(plik)
-            
-
-                            d[cho] += int(line.split('"')[1])
-
-        return d
-
-
-    def Win_percentage_white(self):
-        '''
-        Returns player's win percentage when playing with white pieces.
-        '''
-
-        win,total = 0,0
-
-        with open(self.plik,'r') as plik:
-
-            for line in plik:
-
-                if f'[White "{self.name}"' in line:
-
-                    while '[Result ' not in line:
-                        line = next(plik)
-
-                    if '1-0' in line:
-                        win += 1
-                        total += 1
-
-                    elif '0-1' in line or '1/2-1/2' in line:
-                        total += 1
-
-        if total == 0:
-
-            return 0.00
-
-        return round(win/total,3)
-
-
-
-
-    def Win_percentage_black(self) -> int:
-        '''
-        Returns player's win percentage when playing with black pieces.
-        '''
-
-        win,total = 0,0
-
-        with open(self.plik,'r') as plik:
-
-            for line in plik:
-                    
-                if f'[White ' in line and self.name not in line:
-                        
-                    while '[Result ' not in line:
-                        line = next(plik)
-
-                    if '1-0' in line:
-                        win += 1
-                        total += 1
-
-                    elif '0-1' in line or '1/2-1/2' in line:
-                        total += 1
-
-        if total == 0:
-            return 0.00
-
-
-        return round(win/total,3)
-
-
-    def win_percentage_opponent(self, opponents_name) -> int:
-        '''
-        Returns player's win percentage determined by oponnent.
-
-        Params:
-
-        opponents_name (str): 
-        '''
-        w,t = 0,0
-
-        with open(self.plik, 'r') as plik:
-
-            for line in plik:
-
-                if f'[White "{opponents_name}' in line:
-
-                    res = 0
-
-                    while '[Result ' not in line:
-                        line = next(plik)
-
-                    if '1-0' in line:
-                        t += 1
-
-                    elif '1/2-1/2' in line:
-                        t += 1
-
-                    elif '0-1' in line:
+                    if f'[White "{self.inst.name}"' in line:
                         w += 1
                         t += 1
 
-                elif f'[Black "{opponents_name}' in line:
-
-                    res = 0
-
-                    while '[Result ' not in line:
-                        line = next(plik)
-
-                    if '1-0' in line:
-                        w += 1
+                    elif f'[Black "{self.inst.name}"' in line:
+                        b += 1
                         t += 1
 
-                    elif '1/2-1/2' in line:
-                        t += 1
-
-                    elif '0-1' in line:
-                        t += 1
-
-        return round(w/t, 3)
+            return [w,b,t]
 
 
-    def avg_opponent_elo(self) -> int:
-        '''
-        Returns average oponnent's elo.
-        '''
+        def common_opponents(self, amount : int=None) -> dict:
+            '''
+            Returns player's opponents in decreasing order.
 
-        elo, total = 0,0
+            Params:
 
-        with open(self.plik, 'r') as plik:
+            amount (int) : amount of opponents to be returned.
+            '''
 
-            for line in plik:
+            d = {}
 
-                if f'[White "{self.name}' in line:
+            with open(self.inst.plik, 'r') as plik:
 
-                    while '[BlackElo' not in line:
-                        line = next(plik)
+                for line in plik:
 
-                    if '?' not in line:
-                        elo += int(line.split('"')[1])
-                        total += 1
+                    if f'[White "{self.inst.name}"' in line:
 
-                elif f'[Black "{self.name}' in line:
+                        while '[Black ' not in line:
+                            line = next(plik)
 
-                    while '[WhiteElo' not in line:
-                        line = next(plik)
+                        if line.split('"')[1] not in d:
+                            d[line.split('"')[1]] = 0
 
+                        d[line.split('"')[1]] += 1
 
-                    if '?' not in line:
-                        elo += int(line.split('"')[1])
-                        total += 1
+                    elif f'[White "' in line and self.inst.name not in line:
 
-        return round(elo/total, 3)
+                        if line.split('"')[1] not in d:
+                            d[line.split('"')[1]] = 0
+
+                        d[line.split('"')[1]] += 1
+
+            return dict(sorted(d.items(), key=lambda item: item[1], reverse=True)[:amount]) if amount else d
+        
+
     
+    class __Overall:
 
-    def white_black_total(self) -> list:
-        '''
-        Returns player's number of games with white, black pieces and total amount of games.
-        '''
-
-        w,b,t = 0,0,0
-
-        with open(self.plik, 'r') as plik:
-
-            for line in plik:
-
-                if f'[White "{self.name}"' in line:
-                    w += 1
-                    t += 1
-
-                elif f'[Black "{self.name}"' in line:
-                    b += 1
-                    t += 1
-
-        return [w,b,t]
+        def __init__(self, inst):
+            self.inst = inst
 
 
-    def common_opponents(self, amount : int=None) -> dict:
-        '''
-        Returns player's opponents in decreasing order.
+        def game_types(self) -> dict:
+            '''
+            Returns variants of games played by player.
+            '''
 
-        Params:
+            d = {}
 
-        amount (int) : amount of opponents to be returned.
-        '''
+            with open(self.inst.plik, 'r') as plik:
+                
+                for line in plik:
 
-        d = {}
+                    if '[Variant ' in line:
 
-        with open(self.plik, 'r') as plik:
+                        war = line.split('"')[1]
 
-            for line in plik:
+                        if war not in d:
+                            d[war] = 0
 
-                if f'[White "{self.name}"' in line:
+                        d[war] += 1
 
-                    while '[Black ' not in line:
-                        line = next(plik)
 
-                    if line.split('"')[1] not in d:
-                        d[line.split('"')[1]] = 0
+            return d
 
-                    d[line.split('"')[1]] += 1
 
-                elif f'[White "' in line and self.name not in line:
 
-                    if line.split('"')[1] not in d:
-                        d[line.split('"')[1]] = 0
+        def time_control(self) -> dict:
+            '''
+            Returns time controls of games played by player.
+            '''
 
-                    d[line.split('"')[1]] += 1
+            d = {}
 
-        return dict(sorted(d.items(), key=lambda item: item[1], reverse=True)[:amount]) if amount else d
+            with open(self.inst.plik, 'r') as plik:
+
+                for line in plik:
+
+                    if '[TimeControl ' in line:
+
+                        tc = line.split('"')[1]
+
+                        if tc not in d:
+                            d[tc] = 0
+
+                        d[tc] += 1  
+
+            return d         
+
+
+
+        def count_ofGames_Date(self) -> dict:
+            '''
+            Returns number of games played by player in exact date.
+            '''
+
+            d = {}
+
+            with open(self.inst.plik, 'r') as plik:
+
+                for line in plik:
+
+                    if '[UTCDate ' in line:
+
+                        dzien = line.split('"')[1]
+                        
+                        if dzien not in d:
+                            d[dzien] = 0
+
+                        d[dzien] += 1
+
+            return d
+
+
+
+
+        def count_ofGames_Time(self) -> dict:
+            '''
+            Returns number of games played by player in exact hour.
+            '''
+
+
+            d = {}
+
+            with open(self.inst.plik, 'r') as plik:
+
+                for line in plik:
+
+                    if '[UTCTime ' in line:
+
+                        dzien = line.split('"')[1][:2]
+                        
+                        if dzien not in d:
+                            d[dzien] = 0
+
+                        d[dzien] += 1
+
+            return d
+        
+
+
+        def terminations(self) -> dict:
+            '''
+            Returns way in which games has ended.
+            '''
+
+            d = {}
+
+            with open(self.inst.plik,'r') as plik:
+
+                for line in plik:
+
+                    if '[Termination ' in line:
+
+                        wyb = line.split('"')[1]
+
+                        if wyb not in d:
+                            d[wyb] = 0
+
+                        d[wyb] += 1
+
+            return d
+        
+
+
+        def ranked_unranked(self) -> dict:
+            '''
+            Returns num of ranked and unranked games.
+            '''
+
+            # i know that tournament names often do not describe if they are ranked or unranked, so if games are not specified as ranked/unranked the func 
+            # will not count them.
+
+            d = {'Ranked' : 0, 'Unranked' : 0}
+
+            with open(self.inst.plik, 'r') as plik:
+
+                for line in plik:
+
+                    if '[Event ' in line:
+
+                        line = line.split('"')[1]
+
+                        if 'Rated' in line:
+
+                            d['Ranked'] += 1
+
+                        elif 'Casual' in line:   
+
+                            d['Unranked'] += 1
+
+            return d
+        
+
+    class __Statistics:
+
+        def __init__(self, inst):
+            self.inst = CA.Games(inst)   # proud of this solution fr fr
+            self.inst2 = CA.WDL(inst)
 
         
-    
+        def shortest_game(self, game=True) -> int:
+            '''
+            Returns shortest game.
 
-    
-
-
-#######################                                 OVERALL FUNCTIONS                                         ############
-
-
-    def game_types(self) -> dict:
-        '''
-        Returns variants of games played by player.
-        '''
-
-        d = {}
-
-        with open(self.plik, 'r') as plik:
+            Params:
             
-            for line in plik:
+            game (bool): If set to True, returns game. If set to False, returns length of game
+            '''
 
-                if '[Variant ' in line:
+            gierki = self.inst.pure_moves()
 
-                    war = line.split('"')[1]
+            gierki = sorted(gierki, key=lambda x: len(x.split()))
 
-                    if war not in d:
-                        d[war] = 0
+            gierki = [el for el in gierki if len(el.split()) > 1] # sometimes it happens that game was abandoned and then game is marked with ' '
 
-                    d[war] += 1
+            return gierki[0] if game else len(gierki[0])          # and I do not think that anybody considers it a shortest game
 
 
-        return d
+        def fastest_mate(self) -> int:
+            '''
+            Returns fastest mate.
+            '''
 
+            gry = self.inst.pure_moves(self)
 
+            gry = [el for el in gry if '#' in el]
 
-    def time_control(self) -> dict:
-        '''
-        Returns time controls of games played by player.
-        '''
+            gry = sorted(gry, key=lambda x: len(x.split()))   # mate is always the last move so no need to check # index or other method, keep it simple
 
-        d = {}
+            return len(gry[0].split())
 
-        with open(self.plik, 'r') as plik:
 
-            for line in plik:
+        def avg_game_length(self) -> int:
+            '''
+            Returns average game length. e4 e5 Nf3 Nf6 are treated as 4 moves.
+            '''
 
-                if '[TimeControl ' in line:
+            moves,total = 0,0
 
-                    tc = line.split('"')[1]
+            gry = self.inst.pure_moves(self)
 
-                    if tc not in d:
-                        d[tc] = 0
+            for el in gry:
+                moves += len(el.split())
+                total += 1
 
-                    d[tc] += 1  
+            if total == 0:
+                return 'No games were played'
+            
+            moves = moves/2
 
-        return d         
-
-
-
-    def count_ofGames_Date(self) -> dict:
-        '''
-        Returns number of games played by player in exact date.
-        '''
-
-        d = {}
-
-        with open(self.plik, 'r') as plik:
-
-            for line in plik:
-
-                if '[UTCDate ' in line:
-
-                    dzien = line.split('"')[1]
-                    
-                    if dzien not in d:
-                        d[dzien] = 0
-
-                    d[dzien] += 1
-
-        return d
-
-
-
-
-    def count_ofGames_Time(self) -> dict:
-        '''
-        Returns number of games played by player in exact hour.
-        '''
-
-
-        d = {}
-
-        with open(self.plik, 'r') as plik:
-
-            for line in plik:
-
-                if '[UTCTime ' in line:
-
-                    dzien = line.split('"')[1][:2]
-                    
-                    if dzien not in d:
-                        d[dzien] = 0
-
-                    d[dzien] += 1
-
-        return d
-    
-
-
-    def termination_stats(self) -> dict:
-        '''
-        Returns way in which games has ended.
-        '''
-
-        d = {}
-
-        with open(self.plik,'r') as plik:
-
-            for line in plik:
-
-                if '[Termination ' in line:
-
-                    wyb = line.split('"')[1]
-
-                    if wyb not in d:
-                        d[wyb] = 0
-
-                    d[wyb] += 1
-
-        return d
-    
-
-
-    def ranked_unranked(self) -> dict:
-        '''
-        Returns num of ranked and unranked games.
-        '''
-
-        # i know that tournament names often do not describe if they are ranked or unranked, so if games are not specified as ranked/unranked the func 
-        # will not count them.
-
-        d = {'Ranked' : 0, 'Unranked' : 0}
-
-        with open(self.plik, 'r') as plik:
-
-            for line in plik:
-
-                if '[Event ' in line:
-
-                    line = line.split('"')[1]
-
-                    if 'Rated' in line:
-
-                        d['Ranked'] += 1
-
-                    elif 'Casual' in line:   
-
-                        d['Unranked'] += 1
-
-        return d
-
-
-
-
-
- 
-
-
-
-
-#########################                   STATISTICAL // AVERAGE  RELATED FUNCTIONS              #############################
-
-    def shortest_game(self, game=True) -> int:
-        '''
-        Returns shortest game.
-
-        Params:
+            return round(moves/total,3)
         
-        game (bool): If set to True, returns game. If set to False, returns length of game
-        '''
-
-        gierki = CA.pure_moves(self)
-
-        gierki = sorted(gierki, key=lambda x: len(x.split()))
-
-        gierki = [el for el in gierki if len(el.split()) > 1] # sometimes it happens that game was abandoned and then game is marked with ' '
-
-        return gierki[0] if game else len(gierki[0])          # and I do not think that anybody considers it a shortest game
 
 
-    def fastest_mate(self) -> int:
-        '''
-        Returns fastest mate.
-        '''
+        def xth_move(self, move:int) -> dict:
+            '''
+            Returns dictionary with frequencies of x'th move.
 
-        gry = CA.pure_moves(self)
+            Params:
 
-        gry = [el for el in gry if '#' in el]
+            move(int) : num of move 
+            '''
 
-        gry = sorted(gry, key=lambda x: len(x.split())) # mate is always the last move so no need to check # index or other method, keep it simple
+            d = {}
 
-        return len(gry[0].split())
+            gry = self.inst.pure_moves(self)
 
+            for partia in gry:
 
-    def avg_game_length(self) -> int:
-        '''
-        Returns average game length. e4 e5 Nf3 Nf6 are treated as 4 moves.
-        '''
-
-        moves,total = 0,0
-
-        gry = CA.pure_moves(self)
-
-        for el in gry:
-            moves += len(el.split())
-            total += 1
-
-        if total == 0:
-            return 'No games were played'
-        
-        moves = moves/2
-
-        return round(moves/total,3)
-    
-
-
-    def xth_move(self, move:int) -> dict:
-        '''
-        Returns dictionary with frequencies of x'th move.
-
-        Params:
-
-        move(int) : num of move 
-        '''
-
-        d = {}
-
-        gry = CA.pure_moves(self)
-
-        for partia in gry:
-
-            if len(partia.split())-1 >= move:
-
-                ruch = partia.split()[move]
-
-                if ruch not in d:
-                    d[ruch] = 0
-
-                d[ruch] += 1
-
-        return d
-
-    def xth_move_square(self, move:int) -> dict:
-        '''
-        Returns dictionary with frequencies of x'th move square. 
-
-        Params:
-
-        move (int): num of move
-        '''
-
-        d = {}
-
-        pchars = 'QNBRK'
-
-        gry = CA.pure_moves(self)
-
-        for partia in gry:
-
-            if len(partia.split())-1 >= move:
-
-                ruch = partia.split()[move]
-
-                ruch = ruch.replace('#', '').replace('+', '')
-
-                if ruch[0] in pchars and len(ruch) == 3:
-                    ruch = ruch[1:]
-
-                elif ruch[0] in pchars and len(ruch) == 4:
-                    ruch = ruch[2:]
-
-                if '=' in ruch:
-                    ruch = ruch[:-2]
-
-                if 'x' in ruch:
-                    ruch = ruch[-2:]
-
-                if ruch not in d:
-                    d[ruch] = 0
-
-                d[ruch] += 1
-
-        return d
-    
-
-    def xth_move_opening(self, move: int, opening:str) -> dict:
-        '''
-        Returns dictionary with frequencies of x'th move determined by opening.
-
-        Params:
-
-        move (int): num of move
-        opening (str): distinct opening
-
-
-        '''
-        move = move -1
-
-        d, l = {}, []
-
-        with open(self.plik, 'r') as plik:
-
-            for line in plik:
-
-                if '[Opening' in line and opening in line:
-
-                    while '1. ' not in line:
-                        line = next(plik)
-
-                    line = line.replace('\n', '')
-
-                    l.append(line)
-
-        if l is not None:
-
-            for partia in l:
-
-                partia = CA.game_without_movechars(self,partia)
-
-                if len(partia.split()) - 1 >= move:
+                if len(partia.split())-1 >= move:
 
                     ruch = partia.split()[move]
 
@@ -2705,1295 +2652,1348 @@ class CA:
 
                     d[ruch] += 1
 
-        return d
+            return d
 
+        def xth_move_square(self, move:int) -> dict:
+            '''
+            Returns dictionary with frequencies of x'th move square. 
 
-    def spearman_elo_winrate(self) -> list:
-        '''
-        Returns spearman correlation between elo and winrate.
-        '''
+            Params:
 
-        z = CA.WDL_elo(self)
+            move (int): num of move
+            '''
 
-        d = {}
+            d = {}
 
-        for k,v in z.items():
-            d[k] = round(v[0] / (v[0]+v[1]+v[2]),4)
+            pchars = 'QNBRK'
 
-        x,y  = list(d.keys()) , list(d.values())
+            gry = self.inst.pure_moves(self)
 
-        spearman_corr, p_value = ss.spearmanr(x, y)
+            for partia in gry:
 
-        return [spearman_corr, p_value]
+                if len(partia.split())-1 >= move:
 
+                    ruch = partia.split()[move]
 
+                    ruch = ruch.replace('#', '').replace('+', '')
 
+                    if ruch[0] in pchars and len(ruch) == 3:
+                        ruch = ruch[1:]
 
-                                    ######            BOARD / PIECE RELATED FUNCS               ######################
+                    elif ruch[0] in pchars and len(ruch) == 4:
+                        ruch = ruch[2:]
 
+                    if '=' in ruch:
+                        ruch = ruch[:-2]
 
+                    if 'x' in ruch:
+                        ruch = ruch[-2:]
 
+                    if ruch not in d:
+                        d[ruch] = 0
 
-    def bishop_moves(self, only_player_games : bool =True) -> dict:
-        '''
-        Returns frequencies of each square that bishop has gone to.
+                    d[ruch] += 1
 
-        Params:
+            return d
+        
 
-            only_player_games (bool): Determines if only moves played by player are counted. By default set to True.
-            If set to False, moves made by opponent count as well.
-        '''
+        def xth_move_opening(self, move: int, opening:str) -> dict:
+            '''
+            Returns dictionary with frequencies of x'th move determined by opening.
 
-        d = {}
+            Params:
 
-        if only_player_games:
+            move (int): num of move
+            opening (str): distinct opening
 
-            wg, bg = CA.whitepc_games(self), CA.blackpc_games(self)
 
-            for partia in wg:
+            '''
+            move = move -1
 
-                for i, ruch in enumerate(partia.split()):
+            d, l = {}, []
 
-                    if i % 2 == 0:
+            with open(self.inst.plik, 'r') as plik:
 
-                        if ruch[0] == 'B':
+                for line in plik:
 
-                            hmhm = ''
+                    if '[Opening' in line and opening in line:
 
-                            ruch = ruch.replace('+', '').replace('#', '')
+                        while '1. ' not in line:
+                            line = next(plik)
 
-                            if len(ruch) == 3:
+                        line = line.replace('\n', '')
 
-                                hmhm = ruch[1:]
+                        l.append(line)
 
-                            else:
-                                
-                                hmhm = ruch[-2:]
+            if l is not None:
 
-                            if len(hmhm) == 2:
+                for partia in l:
 
-                                if hmhm not in d:
+                    partia = self.inst.game_without_movechars(partia)
 
-                                    d[hmhm] = 0
+                    if len(partia.split()) - 1 >= move:
 
-                                d[hmhm] += 1
+                        ruch = partia.split()[move]
 
+                        if ruch not in d:
+                            d[ruch] = 0
 
-            for partia in bg:
+                        d[ruch] += 1
 
-                for i, ruch in enumerate(partia.split()):
+            return d
 
-                    if i % 2 != 0:
 
-                        if ruch[0] == 'B':
+        def spearman_elo_winrate(self) -> list:
+            '''
+            Returns spearman correlation between elo and winrate.
+            '''
 
-                            hmhm = ''
+            z = self.inst2.elo()
 
-                            ruch = ruch.replace('+', '').replace('#', '')
+            d = {}
 
-                            if len(ruch) == 3:
+            for k,v in z.items():
+                d[k] = round(v[0] / (v[0]+v[1]+v[2]),4)
 
-                                hmhm = ruch[1:]
+            x,y  = list(d.keys()) , list(d.values())
 
-                            else:
-                                
-                                hmhm = ruch[-2:]
+            spearman_corr, p_value = ss.spearmanr(x, y)
 
-                            if len(hmhm) == 2:
+            return [spearman_corr, p_value]
+        
 
-                                if hmhm not in d:
-
-                                    d[hmhm] = 0
-
-                                d[hmhm] += 1
-
-
-
-
-        else:
-
-            gierki = CA.pure_moves(self)
-
-            for partia in gierki:
-
-                for ruch in partia.split():
-
-                    if ruch[0] == 'B':
-
-                        hm = 0
-
-                        ruch = ruch.replace('#', '').replace('+', '')
-
-                        if len(ruch) == 3:
-                            hm = ruch[1:]
-
-                        else:
-                            hm = ruch[-2:]
-
-                        if len(hm) == 2:
-
-                            if hm not in d:
-                                d[hm] = 0
-
-                            d[hm] += 1
-
-
-        return d
     
+    class _Moves:
+
+        def __init__(self, inst):
+            self.inst = CA.Games(inst)
+
+        def bishop(self, only_player_games : bool =True) -> dict:
+            '''
+            Returns frequencies of each square that bishop has gone to.
+
+            Params:
+
+                only_player_games (bool): Determines if only moves played by player are counted. By default set to True.
+                If set to False, moves made by opponent count as well.
+            '''
+
+            d = {}
+
+            if only_player_games:
+
+                wg, bg = self.inst.whitepc_games(), self.inst.blackpc_games()
+
+                for partia in wg:
+
+                    for i, ruch in enumerate(partia.split()):
+
+                        if i % 2 == 0:
+
+                            if ruch[0] == 'B':
+
+                                hmhm = ''
+
+                                ruch = ruch.replace('+', '').replace('#', '')
+
+                                if len(ruch) == 3:
+
+                                    hmhm = ruch[1:]
+
+                                else:
+                                    
+                                    hmhm = ruch[-2:]
+
+                                if len(hmhm) == 2:
+
+                                    if hmhm not in d:
+
+                                        d[hmhm] = 0
+
+                                    d[hmhm] += 1
 
 
-    ### nothing interesting down there, just same func repeated x times for dif piece 
+                for partia in bg:
+
+                    for i, ruch in enumerate(partia.split()):
+
+                        if i % 2 != 0:
+
+                            if ruch[0] == 'B':
+
+                                hmhm = ''
+
+                                ruch = ruch.replace('+', '').replace('#', '')
+
+                                if len(ruch) == 3:
+
+                                    hmhm = ruch[1:]
+
+                                else:
+                                    
+                                    hmhm = ruch[-2:]
+
+                                if len(hmhm) == 2:
+
+                                    if hmhm not in d:
+
+                                        d[hmhm] = 0
+
+                                    d[hmhm] += 1
 
 
 
-    def queen_moves(self, only_player_games : bool =True) -> dict:
-        '''
-        Returns frequencies of each square that queen has gone to.
 
-        Params:
+            else:
 
-            only_player_games (bool): Determines if only moves played by player are counted. By default set to True.
-            If set to False, moves made by opponent count as well.
-        '''
+                gierki = self.inst.pure_moves()
 
-        d = {}
+                for partia in gierki:
 
-        if only_player_games:
+                    for ruch in partia.split():
 
-            wg, bg = CA.whitepc_games(self), CA.blackpc_games(self)
+                        if ruch[0] == 'B':
 
-            for partia in wg:
+                            hm = 0
 
-                for i, ruch in enumerate(partia.split()):
+                            ruch = ruch.replace('#', '').replace('+', '')
 
-                    if i % 2 == 0:
+                            if len(ruch) == 3:
+                                hm = ruch[1:]
+
+                            else:
+                                hm = ruch[-2:]
+
+                            if len(hm) == 2:
+
+                                if hm not in d:
+                                    d[hm] = 0
+
+                                d[hm] += 1
+
+
+            return d
+        
+
+
+        ### nothing interesting down there, just same func repeated x times for dif piece 
+
+
+
+        def queen(self, only_player_games : bool =True) -> dict:
+            '''
+            Returns frequencies of each square that queen has gone to.
+
+            Params:
+
+                only_player_games (bool): Determines if only moves played by player are counted. By default set to True.
+                If set to False, moves made by opponent count as well.
+            '''
+
+            d = {}
+
+            if only_player_games:
+
+                wg, bg = self.inst.whitepc_games(), self.inst.blackpc_games()
+
+                for partia in wg:
+
+                    for i, ruch in enumerate(partia.split()):
+
+                        if i % 2 == 0:
+
+                            if ruch[0] == 'Q':
+
+                                hmhm = ''
+
+                                ruch = ruch.replace('+', '').replace('#', '')
+
+                                if len(ruch) == 3:
+
+                                    hmhm = ruch[1:]
+
+                                else:
+                                    
+                                    hmhm = ruch[-2:]
+
+                                if len(hmhm) == 2:
+
+                                    if hmhm not in d:
+
+                                        d[hmhm] = 0
+
+                                    d[hmhm] += 1
+
+
+                for partia in bg:
+
+                    for i, ruch in enumerate(partia.split()):
+
+                        if i % 2 != 0:
+
+                            if ruch[0] == 'Q':
+
+                                hmhm = ''
+
+                                ruch = ruch.replace('+', '').replace('#', '')
+
+                                if len(ruch) == 3:
+
+                                    hmhm = ruch[1:]
+
+                                else:
+                                    
+                                    hmhm = ruch[-2:]
+
+                                if len(hmhm) == 2:
+
+                                    if hmhm not in d:
+
+                                        d[hmhm] = 0
+
+                                    d[hmhm] += 1
+
+
+
+
+            else:
+
+                gierki = self.inst.pure_moves()
+
+                for partia in gierki:
+
+                    for ruch in partia.split():
 
                         if ruch[0] == 'Q':
 
-                            hmhm = ''
+                            hm = 0
 
-                            ruch = ruch.replace('+', '').replace('#', '')
-
-                            if len(ruch) == 3:
-
-                                hmhm = ruch[1:]
-
-                            else:
-                                
-                                hmhm = ruch[-2:]
-
-                            if len(hmhm) == 2:
-
-                                if hmhm not in d:
-
-                                    d[hmhm] = 0
-
-                                d[hmhm] += 1
-
-
-            for partia in bg:
-
-                for i, ruch in enumerate(partia.split()):
-
-                    if i % 2 != 0:
-
-                        if ruch[0] == 'Q':
-
-                            hmhm = ''
-
-                            ruch = ruch.replace('+', '').replace('#', '')
+                            ruch = ruch.replace('#', '').replace('+', '')
 
                             if len(ruch) == 3:
-
-                                hmhm = ruch[1:]
+                                hm = ruch[1:]
 
                             else:
+                                hm = ruch[-2:]
+
+                            if len(hm) == 2:
+
+                                if hm not in d:
+                                    d[hm] = 0
+
+                                d[hm] += 1
+
+
+            return d
+
+
+
                                 
-                                hmhm = ruch[-2:]
 
-                            if len(hmhm) == 2:
+        def rook(self, only_player_games : bool =True) -> dict:
+            '''
+            Returns frequencies of each square that rook has gone to.
 
-                                if hmhm not in d:
+            Params:
 
-                                    d[hmhm] = 0
+                only_player_games (bool): Determines if only moves played by player are counted. By default set to True.
+                If set to False, moves made by opponent count as well.
+            '''
 
-                                d[hmhm] += 1
+            d = {}
+
+            if only_player_games:
+
+                wg, bg = self.inst.whitepc_games(), self.inst.blackpc_games()
+
+                for partia in wg:
+
+                    for i, ruch in enumerate(partia.split()):
+
+                        if i % 2 == 0:
+
+                            if ruch[0] == 'R':
+
+                                hmhm = ''
+
+                                ruch = ruch.replace('+', '').replace('#', '')
+
+                                if len(ruch) == 3:
+
+                                    hmhm = ruch[1:]
+
+                                else:
+                                    
+                                    hmhm = ruch[-2:]
+
+                                if len(hmhm) == 2:
+
+                                    if hmhm not in d:
+
+                                        d[hmhm] = 0
+
+                                    d[hmhm] += 1
+
+
+                for partia in bg:
+
+                    for i, ruch in enumerate(partia.split()):
+
+                        if i % 2 != 0:
+
+                            if ruch[0] == 'R':
+
+                                hmhm = ''
+
+                                ruch = ruch.replace('+', '').replace('#', '')
+
+                                if len(ruch) == 3:
+
+                                    hmhm = ruch[1:]
+
+                                else:
+                                    
+                                    hmhm = ruch[-2:]
+
+                                if len(hmhm) == 2:
+
+                                    if hmhm not in d:
+
+                                        d[hmhm] = 0
+
+                                    d[hmhm] += 1
 
 
 
 
-        else:
+            else:
 
-            gierki = CA.pure_moves(self)
+                gierki = self.inst.pure_moves()
 
-            for partia in gierki:
+                for partia in gierki:
 
-                for ruch in partia.split():
+                    for ruch in partia.split():
 
-                    if ruch[0] == 'Q':
+                        if ruch[0] == 'R':
 
-                        hm = 0
+                            hm = 0
 
-                        ruch = ruch.replace('#', '').replace('+', '')
+                            ruch = ruch.replace('#', '').replace('+', '')
 
-                        if len(ruch) == 3:
-                            hm = ruch[1:]
+                            if len(ruch) == 3:
+                                hm = ruch[1:]
 
-                        else:
-                            hm = ruch[-2:]
+                            else:
+                                hm = ruch[-2:]
 
-                        if len(hm) == 2:
+                            if len(hm) == 2:
 
-                            if hm not in d:
-                                d[hm] = 0
+                                if hm not in d:
+                                    d[hm] = 0
 
-                            d[hm] += 1
-
-
-        return d
+                                d[hm] += 1
 
 
+            return d
 
+
+
+
+        def knight(self, only_player_games : bool =True) -> dict:
+            '''
+            Returns frequencies of each square that bishop has gone to.
+
+            Params:
+
+                only_player_games (bool): Determines if only moves played by player are counted. By default set to True.
+                If set to False, moves made by opponent count as well.
+            '''
+
+            d = {}
+
+            if only_player_games:
+
+                wg, bg = self.inst.whitepc_games(), self.inst.blackpc_games()
+
+                for partia in wg:
+
+                    for i, ruch in enumerate(partia.split()):
+
+                        if i % 2 == 0:
+
+                            if ruch[0] == 'N':
+
+                                hmhm = ''
+
+                                ruch = ruch.replace('+', '').replace('#', '')
+
+                                if len(ruch) == 3:
+
+                                    hmhm = ruch[1:]
+
+                                else:
+                                    
+                                    hmhm = ruch[-2:]
+
+                                if len(hmhm) == 2:
+
+                                    if hmhm not in d:
+
+                                        d[hmhm] = 0
+
+                                    d[hmhm] += 1
+
+
+                for partia in bg:
+
+                    for i, ruch in enumerate(partia.split()):
+
+                        if i % 2 != 0:
+
+                            if ruch[0] == 'N':
+
+                                hmhm = ''
+
+                                ruch = ruch.replace('+', '').replace('#', '')
+
+                                if len(ruch) == 3:
+
+                                    hmhm = ruch[1:]
+
+                                else:
+                                    
+                                    hmhm = ruch[-2:]
+
+                                if len(hmhm) == 2:
+
+                                    if hmhm not in d:
+
+                                        d[hmhm] = 0
+
+                                    d[hmhm] += 1
+
+
+
+
+            else:
+
+                gierki = self.inst.pure_moves()
+
+                for partia in gierki:
+
+                    for ruch in partia.split():
+
+                        if ruch[0] == 'N':
+
+                            hm = 0
+
+                            ruch = ruch.replace('#', '').replace('+', '')
+
+                            if len(ruch) == 3:
+                                hm = ruch[1:]
+
+                            else:
+                                hm = ruch[-2:]
+
+                            if len(hm) == 2:
+
+                                if hm not in d:
+                                    d[hm] = 0
+
+                                d[hm] += 1
+
+
+            return d
+
+
+
+        def king(self, only_player_games : bool =True) -> dict:
+            '''
+            Returns frequencies of each square that bishop has gone to.
+
+            Params:
+
+                only_player_games (bool): Determines if only moves played by player are counted. By default set to True.
+                If set to False, moves made by opponent count as well.
+            '''
+
+            d = {}
+
+            if only_player_games:
+
+                wg, bg = self.inst.whitepc_games(), self.inst.blackpc_games()
+
+                for partia in wg:
+
+                    for i, ruch in enumerate(partia.split()):
+
+                        if i % 2 == 0:
+
+                            if ruch[0] == 'K':
+
+                                hmhm = ''
+
+                                ruch = ruch.replace('+', '').replace('#', '')
+
+                                if len(ruch) == 3:
+
+                                    hmhm = ruch[1:]
+
+                                else:
+                                    
+                                    hmhm = ruch[-2:]
+
+                                if len(hmhm) == 2:
+
+                                    if hmhm not in d:
+
+                                        d[hmhm] = 0
+
+                                    d[hmhm] += 1
+
+
+                for partia in bg:
+
+                    for i, ruch in enumerate(partia.split()):
+
+                        if i % 2 != 0:
+
+                            if ruch[0] == 'K':
+
+                                hmhm = ''
+
+                                ruch = ruch.replace('+', '').replace('#', '')
+
+                                if len(ruch) == 3:
+
+                                    hmhm = ruch[1:]
+
+                                else:
+                                    
+                                    hmhm = ruch[-2:]
+
+                                if len(hmhm) == 2:
+
+                                    if hmhm not in d:
+
+                                        d[hmhm] = 0
+
+                                    d[hmhm] += 1
+
+
+
+
+            else:
+
+                gierki = self.inst.pure_moves()
+
+                for partia in gierki:
+
+                    for ruch in partia.split():
+
+                        if ruch[0] == 'K':
+
+                            hm = 0
+
+                            ruch = ruch.replace('#', '').replace('+', '')
+
+                            if len(ruch) == 3:
+                                hm = ruch[1:]
+
+                            else:
+                                hm = ruch[-2:]
+
+                            if len(hm) == 2:
+
+                                if hm not in d:
+                                    d[hm] = 0
+
+                                d[hm] += 1
+
+
+            return d
+        
+
+    class _Squares:
+
+        def __init__(self, inst):
+            self.inst = CA.Games(inst)
+
+        def captures(self, only_player_games : bool =  True) -> dict:
+            '''
+            Returns squares with captures.
+
+            Params:
+
+                only_player_games (bool): Determines if only moves played by player are counted. By default set to True.
+                If set to False, moves made by opponent count as well.
+            '''
+
+            d = {}
+
+
+            if not only_player_games:
+
+                partie = self.inst.pure_moves()
+
+                for partia in partie:
+                    for el in partia.split():
+                        if 'x' in el:
+
+                            if '=' in el:
+                                el = el[:2]
+
+                            el = el.replace("#", '').replace('+', '')
+
+                            el = el[2:]
+
+                            if len(el) == 2:
+
+                                if el not in d:
+                                    d[el] = 0
+
+                                d[el] += 1
+            
+            else:
+
+                wg, bg = self.inst.whitepc_games(), self.inst.blackpc_games()
+
+                for partia in wg:
+
+                    for i,ruch in enumerate(partia.split()):
+
+                        if i % 2 == 0 and 'x' in ruch:
+
+                            ruch = ruch.replace('#', '').replace('+', '')
+
+                            if '=' in ruch:
+                                ruch = ruch[:-2]
+
+                            g = ruch.index('x')
+
+                            ruch = ruch[g+1:]
+
+                            if len(ruch) == 2:
+
+                                if ruch not in d:
+                                    d[ruch] = 0
+
+                                d[ruch] += 1
+
+                for gierka in bg:
+
+                    for i,ruch in enumerate(gierka.split()):
+
+                        if i % 2 != 0 and 'x' in ruch:
+
+                            ruch = ruch.replace('#', '').replace('+', '')
+
+                            if '=' in ruch:
+                                ruch = ruch[:-2]
+
+                            g = ruch.index('x')
+
+                            ruch = ruch[g+1:]
+
+                            if len(ruch) == 2:
+
+                                if ruch not in d:
+                                    d[ruch] = 0
+
+                                d[ruch] += 1
+
+
+
+            return d
+        
+
+        def bishop_captures(self, only_player_games : bool=True) -> dict:
+            '''
+            Returns squares with bishop captures (square on which bishop made a capture, not bishop being captured :)     ).
+
+            Params:
+
+                only_player_games (bool): Determines if only moves played by player are counted. By default set to True.
+                If set to False, moves made by opponent count as well.
+            '''
+
+            if not only_player_games:
+
+                d = {}
+
+                partie = self.inst.pure_moves()
+
+                for partia in partie:
+                    for el in partia.split():
+                        if el [0] == 'B' and 'x' in el:
+
+                            el = el.replace("#", '').replace('+', '')
+
+                            el = el[2:]
+
+                            if len(el) == 2:
+                                if el not in d:
+                                    d[el] = 0
+
+                                d[el] += 1
+
+
+
+            else:
+
+                d = {}
+
+                wg, bg = self.inst.whitepc_games(), self.inst.blackpc_games()
+
+                for partia in wg:
+                    for i,ruch in enumerate(partia.split()):
+                        if i % 2 == 0:
+
+                            if ruch[0] == 'B':
+
+                                ruch = ruch.replace('+', '').replace('x','').replace('#', '')
+
+                                if '=' in ruch:
+                                    ruch = ruch[:-2]   
+                                
+                                if len(ruch) == 3:
+                                    ruch = ruch[1:]
+
+                                if len(ruch) == 2:
+                                    if ruch not in d:
+                                        d[ruch] = 0
+
+                                    d[ruch] += 1
+
+
+                for gierka in bg:
+
+                    for i,ruch in enumerate(gierka.split()):
+                        if i % 2 != 0:
+
+                            if ruch[0] == 'B':
+
+                                ruch = ruch.replace('+', '').replace('x','').replace('#', '') 
+
+                                if '=' in ruch:
+                                    ruch = ruch[:-2]         
+                                
+                                if len(ruch) == 3:
+                                    ruch = ruch[1:]
+
+                                if len(ruch) == 2:
+                                    if ruch not in d:
+                                        d[ruch] = 0
+
+                                    d[ruch] += 1
+
+            
+            return d
+
+
+        def queen_captures(self, only_player_games : bool = True) -> dict:
+            '''
+            Returns squares with queen captures (square on which queen made a capture, not queen being captured :)     ).
+
+            Params:
+
+                only_player_games (bool): Determines if only moves played by player are counted. By default set to True.
+                If set to False, moves made by opponent count as well.
+            '''
+
+            if not only_player_games:
+
+                d = {}
+
+                partie = self.inst.pure_moves()
+
+                for partia in partie:
+                    for el in partia.split():
+                        if el [0] == 'Q' and 'x' in el:
+
+                            el = el.replace("#", '').replace('+', '')
+
+                            el = el[2:]
+
+                            if len(el) == 2:
+                                if el not in d:
+                                    d[el] = 0
+
+                                d[el] += 1
+
+            else:
+
+                d = {}
+
+                wg, bg = self.inst.whitepc_games(), self.inst.blackpc_games()
+
+                for partia in wg:
+                    for i,ruch in enumerate(partia.split()):
+                        if i % 2 == 0:
+
+                            if ruch[0] == 'Q':
+
+                                ruch = ruch.replace('+', '').replace('x','').replace('#', '')
+
+                                if '=' in ruch:
+                                    ruch = ruch[:-2]   
+                                
+                                if len(ruch) == 3:
+                                    ruch = ruch[1:]
+
+                                if len(ruch) == 2:
+                                    if ruch not in d:
+                                        d[ruch] = 0
+
+                                    d[ruch] += 1
+
+
+                for gierka in bg:
+
+                    for i,ruch in enumerate(gierka.split()):
+                        if i % 2 != 0:
+
+                            if ruch[0] == 'Q':
+
+                                ruch = ruch.replace('+', '').replace('x','').replace('#', '') 
+
+                                if '=' in ruch:
+                                    ruch = ruch[:-2]         
+                                
+                                if len(ruch) == 3:
+                                    ruch = ruch[1:]
+
+                                if len(ruch) == 2:
+                                    if ruch not in d:
+                                        d[ruch] = 0
+
+                                    d[ruch] += 1
+
+            
+            return d
+        
+
+        def rook_captures(self, only_player_moves : bool = True) -> dict:
+            '''
+            Returns squares with rook captures (square on which rook made a capture, not rook being captured :)     ).
+
+            Params:
+
+                only_player_games (bool): Determines if only moves played by player are counted. By default set to True.
+                If set to False, moves made by opponent count as well.
+            '''
+
+            if not only_player_moves:
+
+                d = {}
+
+                partie = self.inst.pure_moves()
+
+                for partia in partie:
+                    for el in partia.split():
+                        if el [0] == 'R' and 'x' in el:
+
+                            el = el.replace("#", '').replace('+', '')
+
+                            el = el[2:]
+
+                            if len(el) == 2:
+
+                                if el not in d:
+                                    d[el] = 0
+
+                                d[el] += 1
+
+            else:
+
+                d = {}
+
+                wg, bg = self.inst.whitepc_games(), self.inst.blackpc_games()
+
+                for partia in wg:
+                    for i,ruch in enumerate(partia.split()):
+                        if i % 2 == 0:
+
+                            if ruch[0] =='R':
+
+                                ruch = ruch.replace('+', '').replace('x','').replace('#', '')
+
+                                if '=' in ruch:
+                                    ruch = ruch[:-2]   
+                                
+                                if len(ruch) == 3:
+                                    ruch = ruch[1:]
+
+                                if len(ruch) == 2:
+
+                                    if ruch not in d:
+                                        d[ruch] = 0
+
+                                    d[ruch] += 1
+
+
+                for gierka in bg:
+
+                    for i,ruch in enumerate(gierka.split()):
+                        if i % 2 != 0:
+
+                            if ruch[0] == 'R':
+
+                                ruch = ruch.replace('+', '').replace('x','').replace('#', '') 
+
+                                if '=' in ruch:
+                                    ruch = ruch[:-2]         
+                                
+                                if len(ruch) == 3:
+                                    ruch = ruch[1:]
+
+                                if len(ruch) == 2:
+
+                                    if ruch not in d:
+                                        d[ruch] = 0
+
+                                    d[ruch] += 1
+
+            
+            return d
+        
+
+        def knight_captures(self, only_player_games : bool = True) -> dict:
+            '''
+            Returns squares with knight captures (square on which knight made a capture, not knight being captured :)     ).
+
+            Params:
+
+                only_player_games (bool): Determines if only moves played by player are counted. By default set to True.
+                If set to False, moves made by opponent count as well.
+            '''
+
+            if not only_player_games:
+
+
+                d = {}
+
+                partie = self.inst.pure_moves()
+
+                for partia in partie:
+                    for el in partia.split():
+                        if el [0] == 'N' and 'x' in el:
+
+                            el = el.replace("#", '').replace('+', '')
+
+                            el = el[2:]
+
+                            if len(el) == 2:
+
+                                if el not in d:
+                                    d[el] = 0
+
+                                d[el] += 1
+                
+
+            else:
+
+                d = {}
+
+                wg, bg = self.inst.whitepc_games(), self.inst.blackpc_games()
+
+                for partia in wg:
+                    for i,ruch in enumerate(partia.split()):
+                        if i % 2 == 0:
+
+                            if ruch[0] == 'N':
+
+                                ruch = ruch.replace('+', '').replace('x','').replace('#', '')
+
+                                if '=' in ruch:
+                                    ruch = ruch[:-2]   
+                                
+                                if len(ruch) == 3:
+                                    ruch = ruch[1:]
+
+                                if len(ruch) == 2:
+
+                                    if ruch not in d:
+                                        d[ruch] = 0
+
+                                    d[ruch] += 1
+
+
+                for gierka in bg:
+
+                    for i,ruch in enumerate(gierka.split()):
+                        if i % 2 != 0:
+
+                            if ruch[0] == 'N':
+
+                                ruch = ruch.replace('+', '').replace('x','').replace('#', '') 
+
+                                if '=' in ruch:
+                                    ruch = ruch[:-2]         
+                                
+                                if len(ruch) == 3:
+                                    ruch = ruch[1:]
+
+                                if len(ruch) == 2:
+
+                                    if ruch not in d:
+                                        d[ruch] = 0
+
+                                    d[ruch] += 1
+
+            return d
+
+        
+
+        def king_captures(self, only_player_games : bool = True) -> dict:
+            '''
+            Returns squares with king captures (square on which king made a capture, not king being captured :)     ).
+
+            Params:
+
+                only_player_games (bool): Determines if only moves played by player are counted. By default set to True.
+                If set to False, moves made by opponent count as well.
+            '''
+
+            if not only_player_games:
+
+                d = {}
+
+                partie = self.inst.pure_moves()
+
+                for partia in partie:
+                    for el in partia.split():
+                        if el [0] == 'B' and 'x' in el:
+
+                            el = el.replace("K", '').replace('+', '')
+
+                            el = el[2:]
+
+                            if len(el) == 2:
+
+                                if el not in d:
+                                    d[el] = 0
+
+                                d[el] += 1
+
+            else:
+
+                d = {}
+
+                wg, bg = self.inst.whitepc_games(), self.inst.blackpc_games()
+
+                for partia in wg:
+                    for i,ruch in enumerate(partia.split()):
+                        if i % 2 == 0:
+
+                            if ruch[0] == 'K':
+
+                                ruch = ruch.replace('+', '').replace('x','')                   # no need to replace '#' as u cant give checkmate with king
+                                
+                                if len(ruch) == 3:
+                                    ruch = ruch[1:]
+
+                                if len(ruch) == 2:
+
+                                    if ruch not in d:
+                                        d[ruch] = 0
+
+                                    d[ruch] += 1
+
+                for partia in bg:
+
+                    for i, ruch in enumerate(partia.split()):
+                        if i % 2 != 0:
+                                
+                                if ruch[0] == 'K':
+        
+                                    ruch = ruch.replace('+', '').replace('x','')
+
+                                if len(ruch) == 3:
+                                    ruch = ruch[1:]
+
+                                if len(ruch) == 2:
+                                        
+                                    if ruch not in d:
+                                        d[ruch] = 0
+        
+                                    d[ruch] += 1
                             
+            return d
+        
 
-    def rook_moves(self, only_player_games : bool =True) -> dict:
-        '''
-        Returns frequencies of each square that rook has gone to.
+        def pawn_captures(self, only_player_games : bool = True) -> dict:
+            '''
+            Returns squares with pawn captures (square on which pawn made a capture, not pawn being captured :)     ).
 
-        Params:
+            Params:
 
-            only_player_games (bool): Determines if only moves played by player are counted. By default set to True.
-            If set to False, moves made by opponent count as well.
-        '''
+                only_player_games (bool): Determines if only moves played by player are counted. By default set to True.
+                If set to False, moves made by opponent count as well.
+            '''
 
-        d = {}
+            pawnlet = ['a','b','c','d','e','f','g','h']
 
-        if only_player_games:
+            if not only_player_games:
 
-            wg, bg = CA.whitepc_games(self), CA.blackpc_games(self)
+                d = {}
 
-            for partia in wg:
+                partie = self.inst.pure_moves()
 
-                for i, ruch in enumerate(partia.split()):
+                for partia in partie:
 
-                    if i % 2 == 0:
+                    for el in partia.split():
 
-                        if ruch[0] == 'R':
+                        if el [0] in pawnlet and 'x' in el:
 
-                            hmhm = ''
+                            el = el.replace("#", '').replace('+', '')
 
-                            ruch = ruch.replace('+', '').replace('#', '')
+                            if '=' in el:
+                                el = el[:-2]
 
-                            if len(ruch) == 3:
 
-                                hmhm = ruch[1:]
+                            el = el[2:]
 
-                            else:
+                            if len(el) == 2:
+
+                                if el not in d:
+                                    d[el] = 0
+
+                                d[el] += 1
+                
+
+            else:
+
+                d = {}
+
+                wg, bg = self.inst.whitepc_games(), self.inst.blackpc_games()
+
+                for partia in wg:
+                    for i,ruch in enumerate(partia.split()):
+                        if i % 2 == 0:
+
+                            if ruch[0] in pawnlet:
+
+                                ruch = ruch.replace('+', '').replace('x','').replace('#', '')
+
+                                if '=' in ruch:
+                                    ruch = ruch[:-2]   
                                 
-                                hmhm = ruch[-2:]
+                                if len(ruch) == 3:
+                                    ruch = ruch[1:]
 
-                            if len(hmhm) == 2:
+                                if len(ruch) == 2:
 
-                                if hmhm not in d:
+                                    if ruch not in d:
+                                        d[ruch] = 0
 
-                                    d[hmhm] = 0
-
-                                d[hmhm] += 1
+                                    d[ruch] += 1
 
 
-            for partia in bg:
+                for gierka in bg:
 
-                for i, ruch in enumerate(partia.split()):
+                    for i,ruch in enumerate(gierka.split()):
+                        if i % 2 != 0:
 
-                    if i % 2 != 0:
+                            if ruch[0] in pawnlet:
 
-                        if ruch[0] == 'R':
+                                ruch = ruch.replace('+', '').replace('x','').replace('#', '') 
 
-                            hmhm = ''
-
-                            ruch = ruch.replace('+', '').replace('#', '')
-
-                            if len(ruch) == 3:
-
-                                hmhm = ruch[1:]
-
-                            else:
+                                if '=' in ruch:
+                                    ruch = ruch[:-2]         
                                 
-                                hmhm = ruch[-2:]
+                                if len(ruch) == 3:
+                                    ruch = ruch[1:]
 
-                            if len(hmhm) == 2:
+                                if len(ruch) == 2:
 
-                                if hmhm not in d:
+                                    if ruch not in d:
+                                        d[ruch] = 0
 
-                                    d[hmhm] = 0
+                                    d[ruch] += 1
 
-                                d[hmhm] += 1
+            return d
+        
+                        
+        def promotions(self, only_player_games : bool = True) -> dict:
+            ''''
+            Returns squares with pawn promotions.
 
+            Params:
 
+                only_player_games (bool): Determines if only moves played by player are counted. By default set to True.
+            
+            '''
 
 
-        else:
+            d = {}
 
-            gierki = CA.pure_moves(self)
+            if not only_player_games:
 
-            for partia in gierki:
+                partie = self.inst.pure_moves()
 
-                for ruch in partia.split():
+                for partia in partie:
 
-                    if ruch[0] == 'R':
-
-                        hm = 0
-
-                        ruch = ruch.replace('#', '').replace('+', '')
-
-                        if len(ruch) == 3:
-                            hm = ruch[1:]
-
-                        else:
-                            hm = ruch[-2:]
-
-                        if len(hm) == 2:
-
-                            if hm not in d:
-                                d[hm] = 0
-
-                            d[hm] += 1
-
-
-        return d
-
-
-
-
-    def knight_moves(self, only_player_games : bool =True) -> dict:
-        '''
-        Returns frequencies of each square that bishop has gone to.
-
-        Params:
-
-            only_player_games (bool): Determines if only moves played by player are counted. By default set to True.
-            If set to False, moves made by opponent count as well.
-        '''
-
-        d = {}
-
-        if only_player_games:
-
-            wg, bg = CA.whitepc_games(self), CA.blackpc_games(self)
-
-            for partia in wg:
-
-                for i, ruch in enumerate(partia.split()):
-
-                    if i % 2 == 0:
-
-                        if ruch[0] == 'N':
-
-                            hmhm = ''
-
-                            ruch = ruch.replace('+', '').replace('#', '')
-
-                            if len(ruch) == 3:
-
-                                hmhm = ruch[1:]
-
-                            else:
-                                
-                                hmhm = ruch[-2:]
-
-                            if len(hmhm) == 2:
-
-                                if hmhm not in d:
-
-                                    d[hmhm] = 0
-
-                                d[hmhm] += 1
-
-
-            for partia in bg:
-
-                for i, ruch in enumerate(partia.split()):
-
-                    if i % 2 != 0:
-
-                        if ruch[0] == 'N':
-
-                            hmhm = ''
-
-                            ruch = ruch.replace('+', '').replace('#', '')
-
-                            if len(ruch) == 3:
-
-                                hmhm = ruch[1:]
-
-                            else:
-                                
-                                hmhm = ruch[-2:]
-
-                            if len(hmhm) == 2:
-
-                                if hmhm not in d:
-
-                                    d[hmhm] = 0
-
-                                d[hmhm] += 1
-
-
-
-
-        else:
-
-            gierki = CA.pure_moves(self)
-
-            for partia in gierki:
-
-                for ruch in partia.split():
-
-                    if ruch[0] == 'N':
-
-                        hm = 0
-
-                        ruch = ruch.replace('#', '').replace('+', '')
-
-                        if len(ruch) == 3:
-                            hm = ruch[1:]
-
-                        else:
-                            hm = ruch[-2:]
-
-                        if len(hm) == 2:
-
-                            if hm not in d:
-                                d[hm] = 0
-
-                            d[hm] += 1
-
-
-        return d
-
-
-
-    def king_moves(self, only_player_games : bool =True) -> dict:
-        '''
-        Returns frequencies of each square that bishop has gone to.
-
-        Params:
-
-            only_player_games (bool): Determines if only moves played by player are counted. By default set to True.
-            If set to False, moves made by opponent count as well.
-        '''
-
-        d = {}
-
-        if only_player_games:
-
-            wg, bg = CA.whitepc_games(self), CA.blackpc_games(self)
-
-            for partia in wg:
-
-                for i, ruch in enumerate(partia.split()):
-
-                    if i % 2 == 0:
-
-                        if ruch[0] == 'K':
-
-                            hmhm = ''
-
-                            ruch = ruch.replace('+', '').replace('#', '')
-
-                            if len(ruch) == 3:
-
-                                hmhm = ruch[1:]
-
-                            else:
-                                
-                                hmhm = ruch[-2:]
-
-                            if len(hmhm) == 2:
-
-                                if hmhm not in d:
-
-                                    d[hmhm] = 0
-
-                                d[hmhm] += 1
-
-
-            for partia in bg:
-
-                for i, ruch in enumerate(partia.split()):
-
-                    if i % 2 != 0:
-
-                        if ruch[0] == 'K':
-
-                            hmhm = ''
-
-                            ruch = ruch.replace('+', '').replace('#', '')
-
-                            if len(ruch) == 3:
-
-                                hmhm = ruch[1:]
-
-                            else:
-                                
-                                hmhm = ruch[-2:]
-
-                            if len(hmhm) == 2:
-
-                                if hmhm not in d:
-
-                                    d[hmhm] = 0
-
-                                d[hmhm] += 1
-
-
-
-
-        else:
-
-            gierki = CA.pure_moves(self)
-
-            for partia in gierki:
-
-                for ruch in partia.split():
-
-                    if ruch[0] == 'K':
-
-                        hm = 0
-
-                        ruch = ruch.replace('#', '').replace('+', '')
-
-                        if len(ruch) == 3:
-                            hm = ruch[1:]
-
-                        else:
-                            hm = ruch[-2:]
-
-                        if len(hm) == 2:
-
-                            if hm not in d:
-                                d[hm] = 0
-
-                            d[hm] += 1
-
-
-        return d
-
-
-
-    def squares_with_captures(self, only_player_games : bool =  True) -> dict:
-        '''
-        Returns squares with captures.
-
-        Params:
-
-            only_player_games (bool): Determines if only moves played by player are counted. By default set to True.
-            If set to False, moves made by opponent count as well.
-        '''
-
-        d = {}
-
-
-        if not only_player_games:
-
-            partie = CA.pure_moves(self)
-
-            for partia in partie:
-                for el in partia.split():
-                    if 'x' in el:
+                    for el in partia.split():
 
                         if '=' in el:
+
+                            if 'x' in el:
+                                el = el[2:4]
+                                if len(el) == 2:
+                                    if el not in d:
+                                        d[el] = 0
+
+                                    d[el] += 1
+
                             el = el[:2]
 
-                        el = el.replace("#", '').replace('+', '')
+                            if len(el) == 2:
 
-                        el = el[2:]
+                                if el not in d:
+                                    d[el] = 0
 
-                        if len(el) == 2:
+                                d[el] += 1
 
-                            if el not in d:
-                                d[el] = 0
+            else:
 
-                            d[el] += 1
+                wg, bg = self.inst.whitepc_games(), self.inst.blackpc_games()
+
+                for gra in wg:
+                    for i,el in enumerate(gra.split()):
+                        if i % 2 == 0 and '=' in el:
+
+                            if 'x' in el:
+                                el = el[2:4]
+                                if len(el) == 2:
+                                    if el not in d:
+                                        d[el] = 0
+
+                                    d[el] += 1
+
+                            el = el[:2]
+
+                            if len(el) == 2:
         
-        else:
-
-            wg, bg = CA.whitepc_games(self), CA.blackpc_games(self)
-
-            for partia in wg:
-
-                for i,ruch in enumerate(partia.split()):
-
-                    if i % 2 == 0 and 'x' in ruch:
-
-                        ruch = ruch.replace('#', '').replace('+', '')
-
-                        if '=' in ruch:
-                            ruch = ruch[:-2]
-
-                        g = ruch.index('x')
-
-                        ruch = ruch[g+1:]
-
-                        if len(ruch) == 2:
-
-                            if ruch not in d:
-                                d[ruch] = 0
-
-                            d[ruch] += 1
-
-            for gierka in bg:
-
-                for i,ruch in enumerate(gierka.split()):
-
-                    if i % 2 != 0 and 'x' in ruch:
-
-                        ruch = ruch.replace('#', '').replace('+', '')
-
-                        if '=' in ruch:
-                            ruch = ruch[:-2]
-
-                        g = ruch.index('x')
-
-                        ruch = ruch[g+1:]
-
-                        if len(ruch) == 2:
-
-                            if ruch not in d:
-                                d[ruch] = 0
-
-                            d[ruch] += 1
-
-
-
-        return d
-    
-
-    def squares_with_Bishopcaptures(self, only_player_games : bool=True) -> dict:
-        '''
-        Returns squares with bishop captures (square on which bishop made a capture, not bishop being captured :)     ).
-
-        Params:
-
-            only_player_games (bool): Determines if only moves played by player are counted. By default set to True.
-            If set to False, moves made by opponent count as well.
-        '''
-
-        if not only_player_games:
-
-            d = {}
-
-            partie = CA.pure_moves(self)
-
-            for partia in partie:
-                for el in partia.split():
-                    if el [0] == 'B' and 'x' in el:
-
-                        el = el.replace("#", '').replace('+', '')
-
-                        el = el[2:]
-
-                        if len(el) == 2:
-                            if el not in d:
-                                d[el] = 0
-
-                            d[el] += 1
-
-
-
-        else:
-
-            d = {}
-
-            wg, bg = CA.whitepc_games(self), CA.blackpc_games(self)
-
-            for partia in wg:
-                for i,ruch in enumerate(partia.split()):
-                    if i % 2 == 0:
-
-                        if ruch[0] == 'B':
-
-                            ruch = ruch.replace('+', '').replace('x','').replace('#', '')
-
-                            if '=' in ruch:
-                                ruch = ruch[:-2]   
-                            
-                            if len(ruch) == 3:
-                                ruch = ruch[1:]
-
-                            if len(ruch) == 2:
-                                if ruch not in d:
-                                    d[ruch] = 0
-
-                                d[ruch] += 1
-
-
-            for gierka in bg:
-
-                for i,ruch in enumerate(gierka.split()):
-                    if i % 2 != 0:
-
-                        if ruch[0] == 'B':
-
-                            ruch = ruch.replace('+', '').replace('x','').replace('#', '') 
-
-                            if '=' in ruch:
-                                ruch = ruch[:-2]         
-                            
-                            if len(ruch) == 3:
-                                ruch = ruch[1:]
-
-                            if len(ruch) == 2:
-                                if ruch not in d:
-                                    d[ruch] = 0
-
-                                d[ruch] += 1
-
-        
-        return d
-
-
-    def squares_with_Queencaptures(self, only_player_games : bool = True) -> dict:
-        '''
-        Returns squares with queen captures (square on which queen made a capture, not queen being captured :)     ).
-
-        Params:
-
-            only_player_games (bool): Determines if only moves played by player are counted. By default set to True.
-            If set to False, moves made by opponent count as well.
-        '''
-
-        if not only_player_games:
-
-            d = {}
-
-            partie = CA.pure_moves(self)
-
-            for partia in partie:
-                for el in partia.split():
-                    if el [0] == 'Q' and 'x' in el:
-
-                        el = el.replace("#", '').replace('+', '')
-
-                        el = el[2:]
-
-                        if len(el) == 2:
-                            if el not in d:
-                                d[el] = 0
-
-                            d[el] += 1
-
-        else:
-
-            d = {}
-
-            wg, bg = CA.whitepc_games(self), CA.blackpc_games(self)
-
-            for partia in wg:
-                for i,ruch in enumerate(partia.split()):
-                    if i % 2 == 0:
-
-                        if ruch[0] == 'Q':
-
-                            ruch = ruch.replace('+', '').replace('x','').replace('#', '')
-
-                            if '=' in ruch:
-                                ruch = ruch[:-2]   
-                            
-                            if len(ruch) == 3:
-                                ruch = ruch[1:]
-
-                            if len(ruch) == 2:
-                                if ruch not in d:
-                                    d[ruch] = 0
-
-                                d[ruch] += 1
-
-
-            for gierka in bg:
-
-                for i,ruch in enumerate(gierka.split()):
-                    if i % 2 != 0:
-
-                        if ruch[0] == 'Q':
-
-                            ruch = ruch.replace('+', '').replace('x','').replace('#', '') 
-
-                            if '=' in ruch:
-                                ruch = ruch[:-2]         
-                            
-                            if len(ruch) == 3:
-                                ruch = ruch[1:]
-
-                            if len(ruch) == 2:
-                                if ruch not in d:
-                                    d[ruch] = 0
-
-                                d[ruch] += 1
-
-        
-        return d
-    
-
-    def squares_with_Rookcaptures(self, only_player_moves : bool = True) -> dict:
-        '''
-        Returns squares with rook captures (square on which rook made a capture, not rook being captured :)     ).
-
-        Params:
-
-            only_player_games (bool): Determines if only moves played by player are counted. By default set to True.
-            If set to False, moves made by opponent count as well.
-        '''
-
-        if not only_player_moves:
-
-            d = {}
-
-            partie = CA.pure_moves(self)
-
-            for partia in partie:
-                for el in partia.split():
-                    if el [0] == 'R' and 'x' in el:
-
-                        el = el.replace("#", '').replace('+', '')
-
-                        el = el[2:]
-
-                        if len(el) == 2:
-
-                            if el not in d:
-                                d[el] = 0
-
-                            d[el] += 1
-
-        else:
-
-            d = {}
-
-            wg, bg = CA.whitepc_games(self), CA.blackpc_games(self)
-
-            for partia in wg:
-                for i,ruch in enumerate(partia.split()):
-                    if i % 2 == 0:
-
-                        if ruch[0] =='R':
-
-                            ruch = ruch.replace('+', '').replace('x','').replace('#', '')
-
-                            if '=' in ruch:
-                                ruch = ruch[:-2]   
-                            
-                            if len(ruch) == 3:
-                                ruch = ruch[1:]
-
-                            if len(ruch) == 2:
-
-                                if ruch not in d:
-                                    d[ruch] = 0
-
-                                d[ruch] += 1
-
-
-            for gierka in bg:
-
-                for i,ruch in enumerate(gierka.split()):
-                    if i % 2 != 0:
-
-                        if ruch[0] == 'R':
-
-                            ruch = ruch.replace('+', '').replace('x','').replace('#', '') 
-
-                            if '=' in ruch:
-                                ruch = ruch[:-2]         
-                            
-                            if len(ruch) == 3:
-                                ruch = ruch[1:]
-
-                            if len(ruch) == 2:
-
-                                if ruch not in d:
-                                    d[ruch] = 0
-
-                                d[ruch] += 1
-
-        
-        return d
-    
-
-    def squares_with_Knightcaptures(self, only_player_games : bool = True) -> dict:
-        '''
-        Returns squares with knight captures (square on which knight made a capture, not knight being captured :)     ).
-
-        Params:
-
-            only_player_games (bool): Determines if only moves played by player are counted. By default set to True.
-            If set to False, moves made by opponent count as well.
-        '''
-
-        if not only_player_games:
-
-
-            d = {}
-
-            partie = CA.pure_moves(self)
-
-            for partia in partie:
-                for el in partia.split():
-                    if el [0] == 'N' and 'x' in el:
-
-                        el = el.replace("#", '').replace('+', '')
-
-                        el = el[2:]
-
-                        if len(el) == 2:
-
-                            if el not in d:
-                                d[el] = 0
-
-                            d[el] += 1
-            
-
-        else:
-
-            d = {}
-
-            wg, bg = CA.whitepc_games(self), CA.blackpc_games(self)
-
-            for partia in wg:
-                for i,ruch in enumerate(partia.split()):
-                    if i % 2 == 0:
-
-                        if ruch[0] == 'N':
-
-                            ruch = ruch.replace('+', '').replace('x','').replace('#', '')
-
-                            if '=' in ruch:
-                                ruch = ruch[:-2]   
-                            
-                            if len(ruch) == 3:
-                                ruch = ruch[1:]
-
-                            if len(ruch) == 2:
-
-                                if ruch not in d:
-                                    d[ruch] = 0
-
-                                d[ruch] += 1
-
-
-            for gierka in bg:
-
-                for i,ruch in enumerate(gierka.split()):
-                    if i % 2 != 0:
-
-                        if ruch[0] == 'N':
-
-                            ruch = ruch.replace('+', '').replace('x','').replace('#', '') 
-
-                            if '=' in ruch:
-                                ruch = ruch[:-2]         
-                            
-                            if len(ruch) == 3:
-                                ruch = ruch[1:]
-
-                            if len(ruch) == 2:
-
-                                if ruch not in d:
-                                    d[ruch] = 0
-
-                                d[ruch] += 1
-
-        return d
-
-    
-
-    def squares_with_Kingcaptures(self, only_player_games : bool = True) -> dict:
-        '''
-        Returns squares with king captures (square on which king made a capture, not king being captured :)     ).
-
-        Params:
-
-            only_player_games (bool): Determines if only moves played by player are counted. By default set to True.
-            If set to False, moves made by opponent count as well.
-        '''
-
-        if not only_player_games:
-
-            d = {}
-
-            partie = CA.pure_moves(self)
-
-            for partia in partie:
-                for el in partia.split():
-                    if el [0] == 'B' and 'x' in el:
-
-                        el = el.replace("K", '').replace('+', '')
-
-                        el = el[2:]
-
-                        if len(el) == 2:
-
-                            if el not in d:
-                                d[el] = 0
-
-                            d[el] += 1
-
-        else:
-
-            d = {}
-
-            wg, bg = CA.whitepc_games(self), CA.blackpc_games(self)
-
-            for partia in wg:
-                for i,ruch in enumerate(partia.split()):
-                    if i % 2 == 0:
-
-                        if ruch[0] == 'K':
-
-                            ruch = ruch.replace('+', '').replace('x','')                   # no need to replace '#' as u cant give checkmate with king
-                            
-                            if len(ruch) == 3:
-                                ruch = ruch[1:]
-
-                            if len(ruch) == 2:
-
-                                if ruch not in d:
-                                    d[ruch] = 0
-
-                                d[ruch] += 1
-
-            for partia in bg:
-
-                for i, ruch in enumerate(partia.split()):
-                    if i % 2 != 0:
-                            
-                            if ruch[0] == 'K':
-    
-                                ruch = ruch.replace('+', '').replace('x','')
-
-                            if len(ruch) == 3:
-                                ruch = ruch[1:]
-
-                            if len(ruch) == 2:
-                                    
-                                if ruch not in d:
-                                    d[ruch] = 0
-    
-                                d[ruch] += 1
-                        
-        return d
-    
-
-    def squares_with_Pawncaptures(self, only_player_games : bool = True) -> dict:
-        '''
-        Returns squares with pawn captures (square on which pawn made a capture, not pawn being captured :)     ).
-
-        Params:
-
-            only_player_games (bool): Determines if only moves played by player are counted. By default set to True.
-            If set to False, moves made by opponent count as well.
-        '''
-
-        pawnlet = ['a','b','c','d','e','f','g','h']
-
-        if not only_player_games:
-
-            d = {}
-
-            partie = CA.pure_moves(self)
-
-            for partia in partie:
-
-                for el in partia.split():
-
-                    if el [0] in pawnlet and 'x' in el:
-
-                        el = el.replace("#", '').replace('+', '')
-
-                        if '=' in el:
-                            el = el[:-2]
-
-
-                        el = el[2:]
-
-                        if len(el) == 2:
-
-                            if el not in d:
-                                d[el] = 0
-
-                            d[el] += 1
-            
-
-        else:
-
-            d = {}
-
-            wg, bg = CA.whitepc_games(self), CA.blackpc_games(self)
-
-            for partia in wg:
-                for i,ruch in enumerate(partia.split()):
-                    if i % 2 == 0:
-
-                        if ruch[0] in pawnlet:
-
-                            ruch = ruch.replace('+', '').replace('x','').replace('#', '')
-
-                            if '=' in ruch:
-                                ruch = ruch[:-2]   
-                            
-                            if len(ruch) == 3:
-                                ruch = ruch[1:]
-
-                            if len(ruch) == 2:
-
-                                if ruch not in d:
-                                    d[ruch] = 0
-
-                                d[ruch] += 1
-
-
-            for gierka in bg:
-
-                for i,ruch in enumerate(gierka.split()):
-                    if i % 2 != 0:
-
-                        if ruch[0] in pawnlet:
-
-                            ruch = ruch.replace('+', '').replace('x','').replace('#', '') 
-
-                            if '=' in ruch:
-                                ruch = ruch[:-2]         
-                            
-                            if len(ruch) == 3:
-                                ruch = ruch[1:]
-
-                            if len(ruch) == 2:
-
-                                if ruch not in d:
-                                    d[ruch] = 0
-
-                                d[ruch] += 1
-
-        return d
-    
-                    
-    def squares_with_promotions(self, only_player_games : bool = True) -> dict:
-        ''''
-        Returns squares with pawn promotions.
-
-        Params:
-
-            only_player_games (bool): Determines if only moves played by player are counted. By default set to True.
-        
-        '''
-
-
-        d = {}
-
-        if not only_player_games:
-
-            partie = CA.pure_moves(self)
-
-            for partia in partie:
-
-                for el in partia.split():
-
-                    if '=' in el:
-
-                        if 'x' in el:
-                            el = el[2:4]
-                            if len(el) == 2:
                                 if el not in d:
                                     d[el] = 0
 
                                 d[el] += 1
 
-                        el = el[:2]
+                for gierka in bg:
 
-                        if len(el) == 2:
+                    for i,el in enumerate(gierka.split()):
+                        if i % 2 != 0 and '=' in el:
 
-                            if el not in d:
-                                d[el] = 0
+                            if 'x' in el:
+                                el = el[2:4]
+                                if len(el) == 2:
+                                    if el not in d:
+                                        d[el] = 0
 
-                            d[el] += 1
+                                    d[el] += 1
 
-        else:
-
-            wg, bg = CA.whitepc_games(self), CA.blackpc_games(self)
-
-            for gra in wg:
-                for i,el in enumerate(gra.split()):
-                    if i % 2 == 0 and '=' in el:
-
-                        if 'x' in el:
-                            el = el[2:4]
-                            if len(el) == 2:
-                                if el not in d:
-                                    d[el] = 0
-
-                                d[el] += 1
-
-                        el = el[:2]
-
-                        if len(el) == 2:
-    
-                            if el not in d:
-                                d[el] = 0
-
-                            d[el] += 1
-
-            for gierka in bg:
-
-                for i,el in enumerate(gierka.split()):
-                    if i % 2 != 0 and '=' in el:
-
-                        if 'x' in el:
-                            el = el[2:4]
-                            if len(el) == 2:
-                                if el not in d:
-                                    d[el] = 0
-
-                                d[el] += 1
-
-                        el = el[:2]
-
-                        if len(el) == 2:
-
-                            if el not in d:
-                                d[el] = 0
-
-                            d[el] += 1
-
-        return d
-
-
-    def squares_with_checks(self, only_player_games : bool = True) -> dict:
-        '''
-        Returns squares with checks.
-
-        Params:
-            
-                only_player_games (bool): Determines if only moves played by player are counted. By default set to True.
-                If set to False, moves made by opponent count as well.
-        '''
-
-        d = {}
-
-        if not only_player_games:
-
-            partie = CA.pure_moves(self)
-
-            for partia in partie:
-
-                for el in partia.split():
-
-                    if '+' in el:
-
-                        el =el[:-1]
-
-                        if len(el) == 3:
-
-                            el = el[1:]
+                            el = el[:2]
 
                             if len(el) == 2:
 
@@ -4002,225 +4002,269 @@ class CA:
 
                                 d[el] += 1
 
-                        elif 'x' in el and '=' not in el:
-                            el = el[-2:]
-                            if len(el) == 2:
-                                if el not in d:
-                                    d[el] = 0
-
-                                d[el] += 1
-
-                        elif '=' in el:
-                            el = el[-4:-2]
-                            if len(el) == 2:
-                                if el not in d:
-                                    d[el] = 0
-
-                                d[el] += 1
-
-        else:
+            return d
 
 
-            wg,bg = CA.whitepc_games(self), CA.blackpc_games(self)
+        def checks(self, only_player_games : bool = True) -> dict:
+            '''
+            Returns squares with checks.
 
-            for gra in wg:
-                for i, el in enumerate(gra.split()):
-                    if i % 2 == 0 and '+' in el:
+            Params:
+                
+                    only_player_games (bool): Determines if only moves played by player are counted. By default set to True.
+                    If set to False, moves made by opponent count as well.
+            '''
 
-                        el = el[:-1]
+            d = {}
 
-                        if len(el) == 3:
+            if not only_player_games:
 
-                            el = el[1:]
+                partie = self.inst.pure_moves()
 
-                            if len(el) == 2:
+                for partia in partie:
 
-                                if el not in d:
-                                    d[el] = 0
-
-                                d[el] += 1
-
-                        elif 'x' in el and '=' not in el:
-                            el = el[-2:]
-
-                            if len(el )== 2:
-                                if el not in d:
-                                    d[el] = 0
-
-                                d[el] += 1
-
-                        elif '=' in el:
-                            el = el[-4:-2]
-
-                            if len(el) == 2:
-                                if el not in d:
-                                    d[el] = 0
-
-                                d[el] += 1
-
-            for gierka in bg:
-                for i, el in enumerate(gierka.split()):
-                    if i % 2 != 0 and '+' in el:
-
-                        el = el[:-1]
-
-                        if len(el) == 3:
-
-                            el = el[1:]
-
-                            if len(el) == 2:
-
-                                if el not in d:
-                                    d[el] = 0
-
-                                d[el] += 1
-
-                        elif 'x' in el and '=' not in el:
-                            el = el[-2:]
-                            if len(el) == 2:
-                                if el not in d:
-                                    d[el] = 0
-
-                                d[el] += 1
-
-                        elif '=' in el:
-                            el = el[-4:-2]
-                            if len(el) == 2:
-                                if el not in d:
-                                    d[el] = 0
-
-                                d[el] += 1
-
-        return d
-        
-
-
-
-    def squares_with_mates(self, only_player_games : bool = True) -> dict:
-        '''
-        Returns squares with checkmates.
-
-        Params:
-            
-                only_player_games (bool): Determines if only moves played by player are counted. By default set to True.
-                If set to False, moves made by opponent count as well.
-
-        '''
-
-
-        d = {}
-
-        if not only_player_games:
-
-            partie = CA.pure_moves(self)
-
-            for partia in partie:
-                    
                     for el in partia.split():
-        
-                        if '#' in el:
-        
+
+                        if '+' in el:
+
                             el =el[:-1]
-        
+
                             if len(el) == 3:
-        
+
                                 el = el[1:]
 
                                 if len(el) == 2:
-        
+
                                     if el not in d:
                                         d[el] = 0
-            
+
                                     d[el] += 1
-        
+
                             elif 'x' in el and '=' not in el:
                                 el = el[-2:]
                                 if len(el) == 2:
                                     if el not in d:
                                         d[el] = 0
-            
+
                                     d[el] += 1
-        
+
                             elif '=' in el:
                                 el = el[-4:-2]
                                 if len(el) == 2:
                                     if el not in d:
                                         d[el] = 0
-            
+
                                     d[el] += 1
 
-        else:
+            else:
 
-            wg,bg = CA.whitepc_games(self), CA.blackpc_games(self)
 
-            for gra in wg:
-                for i,el in enumerate(gra.split()):
-                    if i % 2 == 0 and '#' in el:
+                wg, bg = self.inst.whitepc_games(), self.inst.blackpc_games()
 
-                        el = el[:-1]
+                for gra in wg:
+                    for i, el in enumerate(gra.split()):
+                        if i % 2 == 0 and '+' in el:
 
-                        if len(el) == 3:
+                            el = el[:-1]
 
-                            el = el[1:]
+                            if len(el) == 3:
 
-                            if len(el) == 2:
+                                el = el[1:]
 
-                                if el not in d:
-                                    d[el] = 0
+                                if len(el) == 2:
 
-                                d[el] += 1
+                                    if el not in d:
+                                        d[el] = 0
 
-                        elif 'x' in el and '=' not in el:
-                            el = el[-2:]
-                            if len(el) == 2:
-                                if el not in d:
-                                    d[el] = 0
+                                    d[el] += 1
 
-                                d[el] += 1
+                            elif 'x' in el and '=' not in el:
+                                el = el[-2:]
 
-                        elif '=' in el:
-                            el = el[-4:-2]
-                            if len(el) == 2:
-                                if el not in d:
-                                    d[el] = 0
+                                if len(el )== 2:
+                                    if el not in d:
+                                        d[el] = 0
 
-                                d[el] += 1
+                                    d[el] += 1
+
+                            elif '=' in el:
+                                el = el[-4:-2]
+
+                                if len(el) == 2:
+                                    if el not in d:
+                                        d[el] = 0
+
+                                    d[el] += 1
+
+                for gierka in bg:
+                    for i, el in enumerate(gierka.split()):
+                        if i % 2 != 0 and '+' in el:
+
+                            el = el[:-1]
+
+                            if len(el) == 3:
+
+                                el = el[1:]
+
+                                if len(el) == 2:
+
+                                    if el not in d:
+                                        d[el] = 0
+
+                                    d[el] += 1
+
+                            elif 'x' in el and '=' not in el:
+                                el = el[-2:]
+                                if len(el) == 2:
+                                    if el not in d:
+                                        d[el] = 0
+
+                                    d[el] += 1
+
+                            elif '=' in el:
+                                el = el[-4:-2]
+                                if len(el) == 2:
+                                    if el not in d:
+                                        d[el] = 0
+
+                                    d[el] += 1
+
+            return d
             
-            for gierka in bg:
-                for i, el in enumerate(gierka.split()):
-                    if i % 2 != 0 and '#' in el:
 
-                        el = el[:-1]
 
-                        if len(el) == 3:
 
-                            el = el[1:]
+        def checkmates(self, only_player_games : bool = True) -> dict:
+            '''
+            Returns squares with checkmates.
 
-                        if len(el) == 2:
+            Params:
+                
+                    only_player_games (bool): Determines if only moves played by player are counted. By default set to True.
+                    If set to False, moves made by opponent count as well.
 
-                            if el not in d:
-                                d[el] = 0
+            '''
 
-                            d[el] += 1
 
-                        elif 'x' in el and '=' not in el:
-                            el = el[-2:]
+            d = {}
+
+            if not only_player_games:
+
+                partie = self.inst.pure_moves()
+
+                for partia in partie:
+                        
+                        for el in partia.split():
+            
+                            if '#' in el:
+            
+                                el =el[:-1]
+            
+                                if len(el) == 3:
+            
+                                    el = el[1:]
+
+                                    if len(el) == 2:
+            
+                                        if el not in d:
+                                            d[el] = 0
+                
+                                        d[el] += 1
+            
+                                elif 'x' in el and '=' not in el:
+                                    el = el[-2:]
+                                    if len(el) == 2:
+                                        if el not in d:
+                                            d[el] = 0
+                
+                                        d[el] += 1
+            
+                                elif '=' in el:
+                                    el = el[-4:-2]
+                                    if len(el) == 2:
+                                        if el not in d:
+                                            d[el] = 0
+                
+                                        d[el] += 1
+
+            else:
+
+                wg, bg = self.inst.whitepc_games(), self.inst.blackpc_games()
+
+                for gra in wg:
+                    for i,el in enumerate(gra.split()):
+                        if i % 2 == 0 and '#' in el:
+
+                            el = el[:-1]
+
+                            if len(el) == 3:
+
+                                el = el[1:]
+
+                                if len(el) == 2:
+
+                                    if el not in d:
+                                        d[el] = 0
+
+                                    d[el] += 1
+
+                            elif 'x' in el and '=' not in el:
+                                el = el[-2:]
+                                if len(el) == 2:
+                                    if el not in d:
+                                        d[el] = 0
+
+                                    d[el] += 1
+
+                            elif '=' in el:
+                                el = el[-4:-2]
+                                if len(el) == 2:
+                                    if el not in d:
+                                        d[el] = 0
+
+                                    d[el] += 1
+                
+                for gierka in bg:
+                    for i, el in enumerate(gierka.split()):
+                        if i % 2 != 0 and '#' in el:
+
+                            el = el[:-1]
+
+                            if len(el) == 3:
+
+                                el = el[1:]
+
                             if len(el) == 2:
+
                                 if el not in d:
                                     d[el] = 0
 
                                 d[el] += 1
 
-                        elif '=' in el:
+                            elif 'x' in el and '=' not in el:
+                                el = el[-2:]
+                                if len(el) == 2:
+                                    if el not in d:
+                                        d[el] = 0
 
-                            el = el[-4:-2]
+                                    d[el] += 1
 
-                            if len(el) == 2:
-                                if el not in d:
-                                    d[el] = 0
+                            elif '=' in el:
 
-                                d[el] += 1 
+                                el = el[-4:-2]
 
-        return d
-    
+                                if len(el) == 2:
+                                    if el not in d:
+                                        d[el] = 0
+
+                                    d[el] += 1 
+
+            return d
+
+
+
+            
+        
+
+
 
