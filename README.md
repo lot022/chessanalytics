@@ -2,6 +2,10 @@
 
 Library to perform simple operations on input file containing chess games played on Lichess.org.
 
+# NOTE.
+
+Despite the lib being under re-designing process, for now all the info below is up to date.
+
 # Install 
 
       $ pip install chessanalytics
