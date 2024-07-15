@@ -11,159 +11,43 @@ class CAST:
         self.file = file
         self.name = name
         self.ca = CA(self.file, self.name)
+        self.wdl = self.__WDL(self.ca)
+        self.player = self.__Player(self.ca)
+        self.player.bullet = self.player.bullet(self.ca)
+        self.player.blitz = self.player.blitz(self.ca)
+        self.player.rapid = self.player.rapid(self.ca)
+        self.moves = self.__Moves(self.ca)
+        self.squares = self.__Squares(self.ca)
 
 
-                                                        ##########          Win/Draw/Loss Related functions          ##########
+    class __WDL:
+
+        def __init__(self, ca):
+            self.ca = ca
 
 
 
-    def WDL_date(self, colors : list = ['green', 'gray', 'red'], title : str ='Win/Draw/Loss stats by date', xaxis_name:str='Date', yaxis_name : str ='Number of games'):
+        def date(self, colors : list = ['green', 'gray', 'red'], title : str ='Win/Draw/Loss stats by date', xaxis_name:str='Date', yaxis_name : str ='Number of games'):
 
-        '''
-        Generates a plot showing the win, draw, and loss statistics by date.
+            '''
+            Generates a plot showing the win, draw, and loss statistics by date.
 
-        Params:
-        - colors (list): A list of colors for the bars representing win, draw, and loss. Default is ['green', 'gray', 'red'].
-        - title (str): The title of the chart. Default is 'Win/Draw/Loss stats by date'.
-        - xaxis_name (str): The label for the x-axis. Default is 'Date'.
-        - yaxis_name (str): The label for the y-axis. Default is 'Number of games'.
-        '''
-
-
-        assert len(colors) == 3, 'Bars contain colours for win,draw and loss. There is no place for less or more colours.'
-
-        data = self.ca.WDL_Date()
-
-        colorz = colors
+            Params:
+            - colors (list): A list of colors for the bars representing win, draw, and loss. Default is ['green', 'gray', 'red'].
+            - title (str): The title of the chart. Default is 'Win/Draw/Loss stats by date'.
+            - xaxis_name (str): The label for the x-axis. Default is 'Date'.
+            - yaxis_name (str): The label for the y-axis. Default is 'Number of games'.
+            '''
 
 
-        fig = go.Figure()
+            assert len(colors) == 3, 'Bars contain colours for win,draw and loss. There is no place for less or more colours.'
 
-        for key, value in data.items():
-            for i in range(len(value)):
-                fig.add_trace(go.Bar(
-                    x=[key],
-                    y=[value[i]],
-                    marker_color=colorz[i],
-                    name=f'Index {i}'
-                ))
+            data = self.ca.wdl.date()
 
-        fig.update_layout(
-            title=f'{title}',
-            xaxis_title=f'{xaxis_name}',
-            yaxis_title=f'{yaxis_name}',
-            barmode='stack',
-            showlegend=False
-        )
-
-        st.plotly_chart(fig)
+            colorz = colors
 
 
-    def WDL_day(self, colors : list = ['green', 'gray', 'red'], title : str ='Win/Draw/Loss stats by day', xaxis_name:str='Day', yaxis_name : str ='Number of games'):
-        '''
-        Generates a plot showing the win, draw, and loss statistics by day.
-
-        Params: 
-        - colors (list): A list of colors for the bars representing win, draw, and loss. Default is ['green', 'gray', 'red'].
-        - title (str): The title of the chart. Default is 'Win/Draw/Loss stats by day'.
-        - xaxis_name (str): The label for the x-axis. Default is 'Day'.
-        - yaxis_name (str): The label for the y-axis. Default is 'Number of games'.
-        '''
-
-        assert len(colors) == 3, 'Bars contain colours for win,draw and loss. There is no place for less or more colours.'
-
-        data = self.ca.WDL_Day()
-
-        colorz = colors
-
-
-        fig = go.Figure()
-
-        for key, value in data.items():
-            for i in range(len(value)):
-                fig.add_trace(go.Bar(
-                    x=[key],
-                    y=[value[i]],
-                    marker_color=colorz[i],
-                    name=f'Index {i}'
-                ))
-
-        fig.update_layout(
-            title=f'{title}',
-            xaxis_title=f'{xaxis_name}',
-            yaxis_title=f'{yaxis_name}',
-            barmode='stack',
-            showlegend=False
-        )
-
-        st.plotly_chart(fig)
-
-
-    def WDL_opening(self, colors : list = ['green', 'gray', 'red'], title : str ='Win/Draw/Loss stats by opening', xaxis_name:str='Opening', yaxis_name : str ='Number of games'):
-        '''
-        Generates a plot showing the win, draw, and loss statistics by opening.
-
-        Params:
-        - colors (list): A list of colors for the bars representing win, draw, and loss. Default is ['green', 'gray', 'red'].
-        - title (str): The title of the chart. Default is 'Win/Draw/Loss stats by opening'.
-        - xaxis_name (str): The label for the x-axis. Default is 'Opening'.
-        - yaxis_name (str): The label for the y-axis. Default is 'Number of games'.
-        '''
-
-        assert len(colors) == 3, 'Bars contain colours for win,draw and loss. There is no place for less or more colours.'
-
-        data = self.ca.WDL_Opening()
-
-        colorz = colors
-
-        wdl = ['win', 'draw', 'loss']
-
-
-        fig = go.Figure()
-
-        for key, value in data.items():
-            for i in range(len(value)):
-                fig.add_trace(go.Bar(
-                    x=[key],
-                    y=[value[i]],
-                    marker_color=colorz[i],
-                    name=f'{wdl[i]}'
-                ))
-
-        fig.update_layout(
-            title=f'{title}',
-            xaxis_title=f'{xaxis_name}',
-            yaxis_title=f'{yaxis_name}',
-            barmode='stack',
-            showlegend=False
-        )
-
-        st.plotly_chart(fig)
-
-
-    def WDL_part(self, type : str = 'pie', colors : list = ['green', 'gray', 'red'], title : str ='Win/Draw/Loss stats by part of the day', 
-                 xaxis_name:str='Opening', yaxis_name : str ='Number of games'):
-        '''
-        Generates a plot showing the win, draw, and loss statistics by part of the day.
-
-        Params:
-        - type (str): The type of chart to display. Default is 'pie'. Options are 'pie' or 'bar'.
-        - colors (list): A list of colors for the bars representing win, draw, and loss. Default is ['green', 'gray', 'red'].
-        - title (str): The title of the chart. Default is 'Win/Draw/Loss stats by opening'.
-        - xaxis_name (str): The label for the x-axis. Default is 'Opening'.
-        - yaxis_name (str): The label for the y-axis. Default is 'Number of games'.
-        '''
-
-        assert len(colors) == 3, 'Bars contain colours for win,draw and loss. There is no place for less or more colours.'
-
-        data = self.ca.WDL_Part()
-
-        colorz = colors
-
-
-        fig = go.Figure()
-
-        if type=='bar':
+            fig = go.Figure()
 
             for key, value in data.items():
                 for i in range(len(value)):
@@ -182,144 +66,322 @@ class CAST:
                 showlegend=False
             )
 
+            st.plotly_chart(fig)
 
-        ### todo : dodac emoji zamiast nazw coby wygladalo slicznie
-        
-        elif type=='pie':
-            colors = ['green', 'gray', 'red']
 
-           
-            fig = make_subplots(rows=2, cols=2, specs=[[{'type':'domain'}, {'type':'domain'}],
-                                                    [{'type':'domain'}, {'type':'domain'}]],
-                                subplot_titles=list(data.keys()))
+        def day(self, colors : list = ['green', 'gray', 'red'], title : str ='Win/Draw/Loss stats by day', xaxis_name:str='Day', yaxis_name : str ='Number of games'):
+            '''
+            Generates a plot showing the win, draw, and loss statistics by day.
 
-            
-            row, col = 1, 1
-            for key, values in data.items():
-                fig.add_trace(go.Pie(
-                    labels=['Wins', 'Draws', 'Losses'],
-                    values=values,
-                    marker=dict(colors=colors),
-                    name=key
-                ), row=row, col=col)
-                col += 1
-                if col > 2:
-                    col = 1
-                    row += 1
+            Params: 
+            - colors (list): A list of colors for the bars representing win, draw, and loss. Default is ['green', 'gray', 'red'].
+            - title (str): The title of the chart. Default is 'Win/Draw/Loss stats by day'.
+            - xaxis_name (str): The label for the x-axis. Default is 'Day'.
+            - yaxis_name (str): The label for the y-axis. Default is 'Number of games'.
+            '''
 
-            
+            assert len(colors) == 3, 'Bars contain colours for win,draw and loss. There is no place for less or more colours.'
+
+            data = self.ca.wdl.day()
+
+            colorz = colors
+
+
+            fig = go.Figure()
+
+            for key, value in data.items():
+                for i in range(len(value)):
+                    fig.add_trace(go.Bar(
+                        x=[key],
+                        y=[value[i]],
+                        marker_color=colorz[i],
+                        name=f'Index {i}'
+                    ))
+
             fig.update_layout(
-                title_text=f"{title}",
-                height=600,
-                width=600,
+                title=f'{title}',
+                xaxis_title=f'{xaxis_name}',
+                yaxis_title=f'{yaxis_name}',
+                barmode='stack',
+                showlegend=False
             )
 
-
-        st.plotly_chart(fig)
-
+            st.plotly_chart(fig)
 
 
-    def WDL_time(self, colors: list = ['green', 'gray', 'red'], title: str = 'Win/Draw/Loss stats by time', xaxis_name: str = 'Hour', yaxis_name: str = 'Number of games'):
-        """
-        Generates a bar chart showing the win, draw, and loss statistics by time.
+        def openings(self, colors : list = ['green', 'gray', 'red'], title : str ='Win/Draw/Loss stats by opening', xaxis_name:str='Opening', yaxis_name : str ='Number of games'):
+            '''
+            Generates a plot showing the win, draw, and loss statistics by opening.
 
-        Parameters:
-        - colors (list): A list of colors for the bars representing win, draw, and loss. Default is ['green', 'gray', 'red'].
-        - title (str): The title of the chart. Default is 'Win/Draw/Loss stats by time'.
-        - xaxis_name (str): The label for the x-axis. Default is 'Hour'.
-        - yaxis_name (str): The label for the y-axis. Default is 'Number of games'.
+            Params:
+            - colors (list): A list of colors for the bars representing win, draw, and loss. Default is ['green', 'gray', 'red'].
+            - title (str): The title of the chart. Default is 'Win/Draw/Loss stats by opening'.
+            - xaxis_name (str): The label for the x-axis. Default is 'Opening'.
+            - yaxis_name (str): The label for the y-axis. Default is 'Number of games'.
+            '''
 
-        """
+            assert len(colors) == 3, 'Bars contain colours for win,draw and loss. There is no place for less or more colours.'
 
-        assert len(colors) == 3, 'Bars contain colours for win, draw and loss. There is no place for less or more colours.'
+            data = self.ca.wdl.openings()
 
-        data = self.ca.WDL_Time()
+            colorz = colors
 
-        colorz = colors
-
-        names = ['Win', 'Draw', 'Loss']
-
-        fig = go.Figure()
-
-        for key, value in data.items():
-            for i in range(len(value)):
-                fig.add_trace(go.Bar(
-                    x=[key],
-                    y=[value[i]],
-                    marker_color=colorz[i],
-                    name=f'{names[i]}'
-                ))
-
-        fig.update_layout(
-            title=f'{title}',
-            xaxis_title=f'{xaxis_name}',
-            yaxis_title=f'{yaxis_name}',
-            barmode='stack',
-            showlegend=False
-        )
-
-        st.plotly_chart(fig)
+            wdl = ['win', 'draw', 'loss']
 
 
-    def WDL_accurate_elo(self, elo, colors: list = ['green', 'gray', 'red'], title: bool = True):
-        """
-        Calculates and displays the win/draw/loss statistics against players with a specific Elo rating range.
+            fig = go.Figure()
 
-        Parameters:
-        - elo (int): The Elo rating of the players to compare against.
-        - colors (list): A list of colors to use for the metrics. Default is ['green', 'gray', 'red'].
-        - title (bool): Whether to display the title. Default is True.
+            for key, value in data.items():
+                for i in range(len(value)):
+                    fig.add_trace(go.Bar(
+                        x=[key],
+                        y=[value[i]],
+                        marker_color=colorz[i],
+                        name=f'{wdl[i]}'
+                    ))
 
-        """
+            fig.update_layout(
+                title=f'{title}',
+                xaxis_title=f'{xaxis_name}',
+                yaxis_title=f'{yaxis_name}',
+                barmode='stack',
+                showlegend=False
+            )
 
-        if title:
-            st.header(f'Win/Draw/Loss stats against {elo} - {elo+99} rated players.') 
+            st.plotly_chart(fig)
+
+
+        def part_day(self, type : str = 'pie', colors : list = ['green', 'gray', 'red'], title : str ='Win/Draw/Loss stats by part of the day', 
+                    xaxis_name:str='Opening', yaxis_name : str ='Number of games'):
+            '''
+            Generates a plot showing the win, draw, and loss statistics by part of the day.
+
+            Params:
+            - type (str): The type of chart to display. Default is 'pie'. Options are 'pie' or 'bar'.
+            - colors (list): A list of colors for the bars representing win, draw, and loss. Default is ['green', 'gray', 'red'].
+            - title (str): The title of the chart. Default is 'Win/Draw/Loss stats by opening'.
+            - xaxis_name (str): The label for the x-axis. Default is 'Opening'.
+            - yaxis_name (str): The label for the y-axis. Default is 'Number of games'.
+            '''
+
+            assert len(colors) == 3, 'Bars contain colours for win,draw and loss. There is no place for less or more colours.'
+
+            data = self.ca.wdl.part_day()
+
+            colorz = colors
+
+
+            fig = go.Figure()
+
+            if type=='bar':
+
+                for key, value in data.items():
+                    for i in range(len(value)):
+                        fig.add_trace(go.Bar(
+                            x=[key],
+                            y=[value[i]],
+                            marker_color=colorz[i],
+                            name=f'Index {i}'
+                        ))
+
+                fig.update_layout(
+                    title=f'{title}',
+                    xaxis_title=f'{xaxis_name}',
+                    yaxis_title=f'{yaxis_name}',
+                    barmode='stack',
+                    showlegend=False
+                )
+
+
+            ### todo : dodac emoji zamiast nazw coby wygladalo slicznie
             
-        wdl_acelo = self.ca.WDL_accurate_elo(elo)
+            elif type=='pie':
+                colors = ['green', 'gray', 'red']
 
-        col1, col2, col3 = st.columns(3)
+            
+                fig = make_subplots(rows=2, cols=2, specs=[[{'type':'domain'}, {'type':'domain'}],
+                                                        [{'type':'domain'}, {'type':'domain'}]],
+                                    subplot_titles=list(data.keys()))
 
-       
-        with col1:
-            st.metric(label="Wins", value=wdl_acelo[0], delta=wdl_acelo[0])
+                
+                row, col = 1, 1
+                for key, values in data.items():
+                    fig.add_trace(go.Pie(
+                        labels=['Wins', 'Draws', 'Losses'],
+                        values=values,
+                        marker=dict(colors=colors),
+                        name=key
+                    ), row=row, col=col)
+                    col += 1
+                    if col > 2:
+                        col = 1
+                        row += 1
 
-        with col2:
-            st.metric(label="Draws", value=wdl_acelo[1], delta=wdl_acelo[1], delta_color='off')
+                
+                fig.update_layout(
+                    title_text=f"{title}",
+                    height=600,
+                    width=600,
+                )
 
-        with col3:
-            st.metric(label="Losses", value=wdl_acelo[2], delta=wdl_acelo[2], delta_color='inverse')
+
+            st.plotly_chart(fig)
+
+
+
+        def time(self, colors: list = ['green', 'gray', 'red'], title: str = 'Win/Draw/Loss stats by time', xaxis_name: str = 'Hour', yaxis_name: str = 'Number of games'):
+            """
+            Generates a bar chart showing the win, draw, and loss statistics by time.
+
+            Parameters:
+            - colors (list): A list of colors for the bars representing win, draw, and loss. Default is ['green', 'gray', 'red'].
+            - title (str): The title of the chart. Default is 'Win/Draw/Loss stats by time'.
+            - xaxis_name (str): The label for the x-axis. Default is 'Hour'.
+            - yaxis_name (str): The label for the y-axis. Default is 'Number of games'.
+
+            """
+
+            assert len(colors) == 3, 'Bars contain colours for win, draw and loss. There is no place for less or more colours.'
+
+            data = self.ca.wdl.time()
+
+            colorz = colors
+
+            names = ['Win', 'Draw', 'Loss']
+
+            fig = go.Figure()
+
+            for key, value in data.items():
+                for i in range(len(value)):
+                    fig.add_trace(go.Bar(
+                        x=[key],
+                        y=[value[i]],
+                        marker_color=colorz[i],
+                        name=f'{names[i]}'
+                    ))
+
+            fig.update_layout(
+                title=f'{title}',
+                xaxis_title=f'{xaxis_name}',
+                yaxis_title=f'{yaxis_name}',
+                barmode='stack',
+                showlegend=False
+            )
+
+            st.plotly_chart(fig)
+
+
+        def accurate_elo(self, elo, colors: list = ['green', 'gray', 'red'], title: bool = True):
+            """
+            Calculates and displays the win/draw/loss statistics against players with a specific Elo rating range.
+
+            Parameters:
+            - elo (int): The Elo rating of the players to compare against.
+            - colors (list): A list of colors to use for the metrics. Default is ['green', 'gray', 'red'].
+            - title (bool): Whether to display the title. Default is True.
+
+            """
+
+            if title:
+                st.header(f'Win/Draw/Loss stats against {elo} - {elo+99} rated players.') 
+                
+            wdl_acelo = self.ca.wdl.accurate_elo(elo)
+
+            col1, col2, col3 = st.columns(3)
+
+        
+            with col1:
+                st.metric(label="Wins", value=wdl_acelo[0], delta=wdl_acelo[0])
+
+            with col2:
+                st.metric(label="Draws", value=wdl_acelo[1], delta=wdl_acelo[1], delta_color='off')
+
+            with col3:
+                st.metric(label="Losses", value=wdl_acelo[2], delta=wdl_acelo[2], delta_color='inverse')
 
     
-    def WDL_elo(self, plot='bar', colors: list = ['green', 'gray', 'red'], title: str = "Win/Draw/Loss stats by opponent's elo", 
-                xaxis_name: str = 'elo', yaxis_name: str = 'Number of games'):
-        """
-        Generates a bar plot or dataframe showing the win/draw/loss statistics by opponent's elo.
+        def elo(self, plot='bar', colors: list = ['green', 'gray', 'red'], title: str = "Win/Draw/Loss stats by opponent's elo", 
+                    xaxis_name: str = 'elo', yaxis_name: str = 'Number of games'):
+            """
+            Generates a bar plot or dataframe showing the win/draw/loss statistics by opponent's elo.
 
-        Parameters:
-        - plot (str): Specifies the type of plot to generate. Default is 'bar'. Options are 'bar' or 'df'.
-        - colors (list): Specifies the colors for the bars in the plot. Default is ['green', 'gray', 'red'].
-        - title (str): Specifies the title of the plot. Default is "Win/Draw/Loss stats by opponent's elo".
-        - xaxis_name (str): Specifies the label for the x-axis. Default is 'elo'.
-        - yaxis_name (str): Specifies the label for the y-axis. Default is 'Number of games'.
+            Parameters:
+            - plot (str): Specifies the type of plot to generate. Default is 'bar'. Options are 'bar' or 'df'.
+            - colors (list): Specifies the colors for the bars in the plot. Default is ['green', 'gray', 'red'].
+            - title (str): Specifies the title of the plot. Default is "Win/Draw/Loss stats by opponent's elo".
+            - xaxis_name (str): Specifies the label for the x-axis. Default is 'elo'.
+            - yaxis_name (str): Specifies the label for the y-axis. Default is 'Number of games'.
 
-        Returns:
-        - If plot='df', returns a pandas DataFrame containing the win/draw/loss statistics by opponent's elo.
-        - If plot='bar', displays a bar plot using Plotly.
+            Returns:
+            - If plot='df', returns a pandas DataFrame containing the win/draw/loss statistics by opponent's elo.
+            - If plot='bar', displays a bar plot using Plotly.
 
-        Example usage:
-        ca.WDL_elo(plot='bar', colors=['green', 'gray', 'red'], title="Win/Draw/Loss stats by opponent's elo", xaxis_name='elo', yaxis_name='Number of games')
-        """
+            Example usage:
+            ca.WDL_elo(plot='bar', colors=['green', 'gray', 'red'], title="Win/Draw/Loss stats by opponent's elo", xaxis_name='elo', yaxis_name='Number of games')
+            """
 
-        data = self.ca.WDL_elo()
+            data = self.ca.wdl.elo()
 
-        idx = ['Win', 'Draw', 'Loss']
+            idx = ['Win', 'Draw', 'Loss']
 
 
-        if plot=='df':
+            if plot=='df':
 
-            st.dataframe(data)
+                st.dataframe(data)
 
-        elif plot=='bar':
+            elif plot=='bar':
+
+                fig = go.Figure()
+
+                colorz = colors
+
+                for key, value in data.items():
+                    for i in range(len(value)):
+                        fig.add_trace(go.Bar(
+                            x=[key],
+                            y=[value[i]],
+                            marker_color=colorz[i],
+                            name=f' {idx[i]}'
+                        ))
+
+                fig.update_layout(
+                    title=f'{title}',
+                    xaxis_title=f'{xaxis_name}',
+                    yaxis_title=f'{yaxis_name}',
+                    barmode='stack',
+                    showlegend=False
+                )
+
+                st.plotly_chart(fig)
+
+
+  
+
+        def time_control(self, title: str = 'Win/Draw/Loss stats by time control', colors : list = ['green', 'gray', 'red'], 
+                            xaxis_name: str = 'Time control', yaxis_name: str = 'Number of games'):
+
+            """
+            Generates a pie chart visualization of the win/draw/loss statistics by time control.
+
+            Parameters:
+            - title (str): The title of the chart. Default is 'Win/Draw/Loss stats by time control'.
+            - colors (list): The colors for the bar chart. Default is ['green', 'gray', 'red'].
+            - xaxis_name (str): The label for the x-axis. Default is 'Time control'.
+            - yaxis_name (str): The label for the y-axis. Default is 'Number of games'.
+
+
+            This function retrieves the win/draw/loss statistics by time control from the 'ca' object and generates a pie chart
+            visualization using the Plotly library. Each time control category is represented by a separate pie chart.
+
+            Example usage:
+            ca = ChessAnalytics()
+            ca.WDL_time_control(title='Win/Draw/Loss by Time Control', plot_height=800, plot_hole=0.4)
+            """
+
+            idx = ['win', 'draw', 'loss']
+
+
+            data = self.ca.wdl.time_control()
 
             fig = go.Figure()
 
@@ -330,9 +392,9 @@ class CAST:
                     fig.add_trace(go.Bar(
                         x=[key],
                         y=[value[i]],
-                        marker_color=colorz[i],
-                        name=f' {idx[i]}'
-                    ))
+                            marker_color=colorz[i],
+                            name=f' {idx[i]}'
+                        ))
 
             fig.update_layout(
                 title=f'{title}',
@@ -340,131 +402,79 @@ class CAST:
                 yaxis_title=f'{yaxis_name}',
                 barmode='stack',
                 showlegend=False
-            )
+                )
 
             st.plotly_chart(fig)
 
 
-  
 
-    def WDL_time_control(self, title: str = 'Win/Draw/Loss stats by time control', colors : list = ['green', 'gray', 'red'], 
-                         xaxis_name: str = 'Time control', yaxis_name: str = 'Number of games'):
+        def gametype(self, plot='pie', colors: list = ['green', 'gray', 'red'], title: str = "Win/Draw/Loss stats by game type", 
+                        xaxis_name: str = 'Game type', yaxis_name: str = 'Number of games', plot_height: int = 700, plot_hole : float = 0.3):
+            '''
+            Generates a pie chart or dataframe showing the win/draw/loss statistics by game type.
 
-        """
-        Generates a pie chart visualization of the win/draw/loss statistics by time control.
+            Params:
+            - plot (str): The type of chart to display. Default is 'pie'. Options are 'pie', 'bar' or 'df'.
+            - colors (list): The colors for the pie chart. Default is ['green', 'gray', 'red'].
+            - title (str): The title of the chart. Default is 'Win/Draw/Loss stats by game type'.
+            - xaxis_name (str): The label for the x-axis. Default is 'Game type'.
+            - yaxis_name (str): The label for the y-axis. Default is 'Number of games'.
+            - plot_height (int): The height of the chart in pixels. Default is 700.
+            - plot_hole (float): The size of the hole in the center of the pie chart. Default is 0.3.
+            
+            '''
 
-        Parameters:
-        - title (str): The title of the chart. Default is 'Win/Draw/Loss stats by time control'.
-        - colors (list): The colors for the bar chart. Default is ['green', 'gray', 'red'].
-        - xaxis_name (str): The label for the x-axis. Default is 'Time control'.
-        - yaxis_name (str): The label for the y-axis. Default is 'Number of games'.
+            gmtp = self.ca.wdl.gametype()
 
-
-        This function retrieves the win/draw/loss statistics by time control from the 'ca' object and generates a pie chart
-        visualization using the Plotly library. Each time control category is represented by a separate pie chart.
-
-        Example usage:
-        ca = ChessAnalytics()
-        ca.WDL_time_control(title='Win/Draw/Loss by Time Control', plot_height=800, plot_hole=0.4)
-        """
-
-        idx = ['win', 'draw', 'loss']
-
-
-        data = self.ca.WDL_time_control()
-
-        fig = go.Figure()
-
-        colorz = colors
-
-        for key, value in data.items():
-            for i in range(len(value)):
-                fig.add_trace(go.Bar(
-                    x=[key],
-                    y=[value[i]],
-                        marker_color=colorz[i],
-                        name=f' {idx[i]}'
-                    ))
-
-        fig.update_layout(
-            title=f'{title}',
-            xaxis_title=f'{xaxis_name}',
-            yaxis_title=f'{yaxis_name}',
-            barmode='stack',
-            showlegend=False
-            )
-
-        st.plotly_chart(fig)
-
-
-
-    def WDL_gametype(self, plot='pie', colors: list = ['green', 'gray', 'red'], title: str = "Win/Draw/Loss stats by game type", 
-                     xaxis_name: str = 'Game type', yaxis_name: str = 'Number of games', plot_height: int = 700, plot_hole : float = 0.3):
-        '''
-        Generates a pie chart or dataframe showing the win/draw/loss statistics by game type.
-
-        Params:
-        - plot (str): The type of chart to display. Default is 'pie'. Options are 'pie', 'bar' or 'df'.
-        - colors (list): The colors for the pie chart. Default is ['green', 'gray', 'red'].
-        - title (str): The title of the chart. Default is 'Win/Draw/Loss stats by game type'.
-        - xaxis_name (str): The label for the x-axis. Default is 'Game type'.
-        - yaxis_name (str): The label for the y-axis. Default is 'Number of games'.
-        - plot_height (int): The height of the chart in pixels. Default is 700.
-        - plot_hole (float): The size of the hole in the center of the pie chart. Default is 0.3.
-        
-        '''
-
-        gmtp = self.ca.WDL_gametype()
-
-        idx = ['Win', 'Draw', 'Loss']
-
-        fig = go.Figure()
-
-        if plot=='df':
-            st.dataframe(gmtp)
-
-        elif plot=='bar':
+            idx = ['Win', 'Draw', 'Loss']
 
             fig = go.Figure()
 
-            colorz = colors
+            if plot=='df':
+                st.dataframe(gmtp)
 
-            for key, value in gmtp.items():
-                for i in range(len(value)):
-                    fig.add_trace(go.Bar(
-                        x=[key],
-                        y=[value[i]],
-                        marker_color=colorz[i],
-                        name=f' {idx[i]}'
-                    ))
+            elif plot=='bar':
 
-            fig.update_layout(
-                title=f'{title}',
-                xaxis_title=f'{xaxis_name}',
-                yaxis_title=f'{yaxis_name}',
-                barmode='stack',
-                showlegend=False
-            )
+                fig = go.Figure()
 
-            st.plotly_chart(fig)
+                colorz = colors
 
-        elif plot=='pie':
+                for key, value in gmtp.items():
+                    for i in range(len(value)):
+                        fig.add_trace(go.Bar(
+                            x=[key],
+                            y=[value[i]],
+                            marker_color=colorz[i],
+                            name=f' {idx[i]}'
+                        ))
 
-            for i, (key, values) in enumerate(gmtp.items()):
-                fig.add_trace(go.Pie(
-                    labels=['Win', 'Draw', 'Loss'],
-                    values=values,
-                    name=key,
-                    hole=plot_hole,
-                ).update(domain=dict(row=i // 2, column=i % 2), title=key))
+                fig.update_layout(
+                    title=f'{title}',
+                    xaxis_title=f'{xaxis_name}',
+                    yaxis_title=f'{yaxis_name}',
+                    barmode='stack',
+                    showlegend=False
+                )
 
-            fig.update_layout(
-                grid=dict(rows=2, columns=2),
-                title=f'{title}',
-                height=plot_height
-            )
+                st.plotly_chart(fig)
 
-            st.plotly_chart(fig)
+            elif plot=='pie':
+
+                for i, (key, values) in enumerate(gmtp.items()):
+                    fig.add_trace(go.Pie(
+                        labels=['Win', 'Draw', 'Loss'],
+                        values=values,
+                        name=key,
+                        hole=plot_hole,
+                    ).update(domain=dict(row=i // 2, column=i % 2), title=key))
+
+                fig.update_layout(
+                    grid=dict(rows=2, columns=2),
+                    title=f'{title}',
+                    height=plot_height
+                )
+
+                st.plotly_chart(fig)
             
 
 
@@ -531,330 +541,349 @@ class CAST:
 
 
 
-                                                        ################   PLAYER STATS RELATED FUNCTIONS     ################
+    class __Player:
+
+        def __init__(self, ca):
+            self.ca = ca
+
+        class bullet:
+            def __init__(self, ca):
+                self.ca = ca
 
     
 
-    def bullet_progress(self, x_title : str='Number of games', y_title : str='Elo', plot_title: str ='Elo progress over time'):
-        '''
-        Generates a plot showing the progress of the player's elo progress in bullet games over time.
+            def bullet_progress(self, x_title : str='Number of games', y_title : str='Elo', plot_title: str ='Elo progress over time'):
+                '''
+                Generates a plot showing the progress of the player's elo progress in bullet games over time.
 
-        Params:
-        - x_title (str): The title of the x-axis. Default is 'Number of games'.
-        - y_title (str): The title of the y-axis. Default is 'Elo'.
-        - plot_title (str): The title of the plot. Default is 'Elo progress over time'.
-        '''
-        bulprog = self.ca.bullet_progress()
+                Params:
+                - x_title (str): The title of the x-axis. Default is 'Number of games'.
+                - y_title (str): The title of the y-axis. Default is 'Elo'.
+                - plot_title (str): The title of the plot. Default is 'Elo progress over time'.
+                '''
+                bulprog = self.ca.player.Bullet.progress()
 
-        fig = go.Figure()
+                fig = go.Figure()
 
-        fig.add_trace(go.Scatter(
-            x=list(range(len(bulprog))),
-            y=bulprog,
-            mode='lines+markers'
-        ))
+                fig.add_trace(go.Scatter(
+                    x=list(range(len(bulprog))),
+                    y=bulprog,
+                    mode='lines+markers'
+                ))
 
-        fig.update_layout(
-            title=plot_title,
-            xaxis_title=f'{x_title}',
-            yaxis_title=f'{y_title}'
-        )
+                fig.update_layout(
+                    title=plot_title,
+                    xaxis_title=f'{x_title}',
+                    yaxis_title=f'{y_title}'
+                )
 
-        st.plotly_chart(fig)
+                st.plotly_chart(fig)
 
-    
-    def blitz_progress(self, x_title : str ='Number of games', y_title : str ='Elo', plot_title : str ='Elo progress over time'):
-        '''
-        Generates a plot showing the progress of the player's elo progress in blitz games over time.
+            def progress_date(self, title : str = 'Bullet elo progress by date', x_title : str = 'Date', y_title : str = 'Elo'):
+                '''
+                Generates a plot showing the progress of the player's elo progress in bullet games by date.
 
-        Params:
-        - x_title (str): The title of the x-axis. Default is 'Number of games'.
-        - y_title (str): The title of the y-axis. Default is 'Elo'.
-        - plot_title (str): The title of the plot. Default is 'Elo progress over time'.
-        '''
+                Params:
+                - title (str): The title of the plot. Default is 'Bullet elo progress by date'.
+                - x_title (str): The title of the x-axis. Default is 'Date'.
+                - y_title (str): The title of the y-axis. Default is 'Elo'.
+                '''
 
-        bulprog = self.ca.blitz_progress()
+                bulprog = self.ca.player.Bullet.progress_date()
 
-        fig = go.Figure()
+                klucze = list(sorted(bulprog.keys()))
+                wartosci = list(bulprog.values())
 
-        fig.add_trace(go.Scatter(
-            x=list(range(len(bulprog))),
-            y=bulprog,
-            mode='lines+markers'
-        ))
 
+                fig = go.Figure()
 
-        fig.update_layout(
-            title=plot_title,
-            xaxis_title=f'{x_title}',
-            yaxis_title=f'{y_title}'
-        )
+                fig.add_trace(go.Scatter(x=klucze, y=wartosci, mode='lines+markers', name='Wartości'))
 
-        st.plotly_chart(fig)
+                fig.update_layout(
+                    title=f'{title}',
+                    xaxis_title=f'{x_title}',
+                    yaxis_title=f'{y_title}'
+                )
 
+                st.plotly_chart(fig)
 
-    def rapid_progress(self, x_title : str ='Number of games', y_title : str ='Elo', plot_title : str ='Elo progress over time'):
+            def progress_hour(self, title : str = 'Bullet elo progress by hour', x_title : str = 'Hour', y_title : str = 'Elo',
+                                        type : str = 'bar'):
+                    
+                '''
+                Generates a plot showing the progress of the player's elo progress in bullet games by hour of game.
 
-        '''
-        Generates a plot showing the progress of the player's elo progress in rapid games over time.
+                Params:
+                - title (str): The title of the plot. Default is 'Bullet elo progress by hour'.
+                - x_title (str): The title of the x-axis. Default is 'Hour'.
+                - y_title (str): The title of the y-axis. Default is 'Elo'.
+                - type (str): The type of plot to generate. Default is 'bar'. Options are 'bar' or 'line'.
+                '''
 
-        Params:
-        - x_title (str): The title of the x-axis. Default is 'Number of games'.
-        - y_title (str): The title of the y-axis. Default is 'Elo'.
-        - plot_title (str): The title of the plot. Default is 'Elo progress over time'.
+                bph = self.ca.player.Bullet.progress_hour()
 
-        '''
+                klucze = list(sorted(bph.keys()))
+                wartosci = list(bph.values())
 
-        raprog = self.ca.blitz_progress()
+                if type=='line':
 
-        fig = go.Figure()
+                    fig = go.Figure()
 
-        fig.add_trace(go.Scatter(
-            x=list(range(len(raprog))),
-            y=raprog,
-            mode='lines+markers'
-        ))
+                    fig.add_trace(go.Scatter(x=klucze, y=wartosci, mode='lines+markers', name='Wartości'))
 
+                    fig.update_layout(
+                        title=f'{title}',
+                        xaxis_title=f'{x_title}',
+                        yaxis_title=f'{y_title}'
+                    )
 
-        fig.update_layout(
-            title=plot_title,
-            xaxis_title=f'{x_title}',
-            yaxis_title=f'{y_title}'
-        )
+                    st.plotly_chart(fig)
 
-        st.plotly_chart(fig)
+                elif type=='bar':
 
-    
-    def bullet_progress_date(self, title : str = 'Bullet elo progress by date', x_title : str = 'Date', y_title : str = 'Elo'):
-        '''
-        Generates a plot showing the progress of the player's elo progress in bullet games by date.
+                    fig = go.Figure()
 
-        Params:
-        - title (str): The title of the plot. Default is 'Bullet elo progress by date'.
-        - x_title (str): The title of the x-axis. Default is 'Date'.
-        - y_title (str): The title of the y-axis. Default is 'Elo'.
-        '''
+                    fig.add_trace(go.Bar(x=klucze, y=wartosci))
 
-        bulprog = self.ca.bullet_progress_date()
+                    fig.update_layout(
+                        title=f'{title}',
+                        xaxis_title=f'{x_title}',
+                        yaxis_title=f'{y_title}'
+                    )
 
-        klucze = list(sorted(bulprog.keys()))
-        wartosci = list(bulprog.values())
-
-
-        fig = go.Figure()
-
-        fig.add_trace(go.Scatter(x=klucze, y=wartosci, mode='lines+markers', name='Wartości'))
-
-        fig.update_layout(
-            title=f'{title}',
-            xaxis_title=f'{x_title}',
-            yaxis_title=f'{y_title}'
-        )
-
-        st.plotly_chart(fig)
-
-
-    def blitz_progress_date(self, title : str = 'Blitz elo progress by date', x_title : str = 'Date', y_title : str = 'Elo'):
-
-        '''
-        Generates a plot showing the progress of the player's elo progress in blitz games by date.
-
-        Params:
-        - title (str): The title of the plot. Default is 'Blitz elo progress by date'.
-        - x_title (str): The title of the x-axis. Default is 'Date'.
-        - y_title (str): The title of the y-axis. Default is 'Elo'.
-        '''
-
-        blzprog = self.ca.bullet_progress_date()
-
-        klucze = list(sorted(blzprog.keys()))
-        wartosci = list(blzprog.values())
-
-        fig = go.Figure()
-
-        fig.add_trace(go.Scatter(x=klucze, y=wartosci, mode='lines+markers', name='Wartości'))
-
-        fig.update_layout(
-            title=f'{title}',
-            xaxis_title=f'{x_title}',
-            yaxis_title=f'{y_title}'
-        )
-
-        st.plotly_chart(fig)
-
-
-    def rapid_progress_date(self, title : str = 'Rapid elo progress by date', x_title : str = 'Date', y_title : str = 'Elo'):
-        '''
-        Generates a plot showing the progress of the player's elo progress in rapid games by date.
-
-        Params:
-        - title (str): The title of the plot. Default is 'Rapid elo progress by date'.
-        - x_title (str): The title of the x-axis. Default is 'Date'.
-        - y_title (str): The title of the y-axis. Default is 'Elo'.
-
-        '''
-
-        raprog = self.ca.bullet_progress_date()
-
-        klucze = list(sorted(raprog.keys()))
-        wartosci = list(raprog.values())
-
-        fig = go.Figure()
-
-        fig.add_trace(go.Scatter(x=klucze, y=wartosci, mode='lines+markers', name='Wartości'))
-
-        fig.update_layout(
-            title=f'{title}',
-            xaxis_title=f'{x_title}',
-            yaxis_title=f'{y_title}'
-        )
-
-        st.plotly_chart(fig)
-
-
-    def bullet_progress_hour(self, title : str = 'Bullet elo progress by hour', x_title : str = 'Hour', y_title : str = 'Elo',
-                             type : str = 'bar'):
-        
-        '''
-        Generates a plot showing the progress of the player's elo progress in bullet games by hour of game.
-
-        Params:
-        - title (str): The title of the plot. Default is 'Bullet elo progress by hour'.
-        - x_title (str): The title of the x-axis. Default is 'Hour'.
-        - y_title (str): The title of the y-axis. Default is 'Elo'.
-        - type (str): The type of plot to generate. Default is 'bar'. Options are 'bar' or 'line'.
-        '''
-
-        bph = self.ca.bullet_progress_hour()
-
-        klucze = list(sorted(bph.keys()))
-        wartosci = list(bph.values())
-
-        if type=='line':
-
-            fig = go.Figure()
-
-            fig.add_trace(go.Scatter(x=klucze, y=wartosci, mode='lines+markers', name='Wartości'))
-
-            fig.update_layout(
-                title=f'{title}',
-                xaxis_title=f'{x_title}',
-                yaxis_title=f'{y_title}'
-            )
-
-            st.plotly_chart(fig)
-
-        elif type=='bar':
-
-            fig = go.Figure()
-
-            fig.add_trace(go.Bar(x=klucze, y=wartosci))
-
-            fig.update_layout(
-                title=f'{title}',
-                xaxis_title=f'{x_title}',
-                yaxis_title=f'{y_title}'
-            )
-
-            st.plotly_chart(fig)
+                    st.plotly_chart(fig)
+                
     
 
+        class blitz:
 
-    def blitz_progress_hour(self, title : str = 'Blitz elo progress by hour', x_title : str = 'Hour', y_title : str = 'Elo',
-                             type : str = 'bar'):
+            def __init__(self, ca):
+                self.ca = ca
+    
+            def progress(self, x_title : str ='Number of games', y_title : str ='Elo', plot_title : str ='Elo progress over time'):
+                '''
+                Generates a plot showing the progress of the player's elo progress in blitz games over time.
 
-        '''
-        Generates a plot showing the progress of the player's elo progress in blitz games by hour of game.
+                Params:
+                - x_title (str): The title of the x-axis. Default is 'Number of games'.
+                - y_title (str): The title of the y-axis. Default is 'Elo'.
+                - plot_title (str): The title of the plot. Default is 'Elo progress over time'.
+                '''
 
-        Params:
-        - title (str): The title of the plot. Default is 'Blitz elo progress by hour'.
-        - x_title (str): The title of the x-axis. Default is 'Hour'.
-        - y_title (str): The title of the y-axis. Default is 'Elo'.
-        - type (str): The type of plot to generate. Default is 'bar'. Options are 'bar' or 'line'.
-        '''
+                blitzprog = self.ca.player.Blitz.progress()
 
-        bph = self.ca.bullet_progress_hour()
+                fig = go.Figure()
 
-        klucze = list(sorted(bph.keys()))
-        wartosci = list(bph.values())
-
-        if type=='line':
-
-            fig = go.Figure()
-
-            fig.add_trace(go.Scatter(x=klucze, y=wartosci, mode='lines+markers'))
-
-
-            fig.update_layout(
-                title=f'{title}',
-                xaxis_title=f'{x_title}',
-                yaxis_title=f'{y_title}'
-            )
-
-            st.plotly_chart(fig)
-
-        elif type=='bar':
-
-            fig = go.Figure()
-
-            fig.add_trace(go.Bar(x=klucze, y=wartosci))
-
-            fig.update_layout(
-                title=f'{title}',
-                xaxis_title=f'{x_title}',
-                yaxis_title=f'{y_title}'
-            )
-
-            st.plotly_chart(fig)
+                fig.add_trace(go.Scatter(
+                    x=list(range(len(blitzprog))),
+                    y=blitzprog,
+                    mode='lines+markers'
+                ))
 
 
-    def rapid_progress_hour(self, title : str = 'Rapid elo progress by hour', x_title : str = 'Hour', y_title : str = 'Elo',
-                             type : str = 'bar'):
-        
-        '''
-        Generates a plot showing the progress of the player's elo progress in rapid games by hour of game.
+                fig.update_layout(
+                    title=plot_title,
+                    xaxis_title=f'{x_title}',
+                    yaxis_title=f'{y_title}'
+                )
 
-        Params:
-        - title (str): The title of the plot. Default is 'Rapid elo progress by hour'.
-        - x_title (str): The title of the x-axis. Default is 'Hour'.
-        - y_title (str): The title of the y-axis. Default is 'Elo'.
-        - type (str): The type of plot to generate. Default is 'bar'. Options are 'bar' or 'line'.
-        '''
+                st.plotly_chart(fig)
 
-        rph = self.ca.bullet_progress_hour()
+            def progress_date(self, title : str = 'Blitz elo progress by date', x_title : str = 'Date', y_title : str = 'Elo'):
 
-        klucze, wartosci = list(sorted(rph.keys())),list(rph.values())
+                    '''
+                    Generates a plot showing the progress of the player's elo progress in blitz games by date.
 
-        if type=='line':
+                    Params:
+                    - title (str): The title of the plot. Default is 'Blitz elo progress by date'.
+                    - x_title (str): The title of the x-axis. Default is 'Date'.
+                    - y_title (str): The title of the y-axis. Default is 'Elo'.
+                    '''
+
+                    blzprog = self.ca.player.Blitz.progress_date()
+
+                    klucze = list(sorted(blzprog.keys()))
+                    wartosci = list(blzprog.values())
+
+                    fig = go.Figure()
+
+                    fig.add_trace(go.Scatter(x=klucze, y=wartosci, mode='lines+markers', name='Wartości'))
+
+                    fig.update_layout(
+                        title=f'{title}',
+                        xaxis_title=f'{x_title}',
+                        yaxis_title=f'{y_title}'
+                    )
+
+                    st.plotly_chart(fig)
 
 
-            fig = go.Figure()
+            def progress_hour(self, title : str = 'Blitz elo progress by hour', x_title : str = 'Hour', y_title : str = 'Elo',
+                                    type : str = 'bar'):
 
-            fig.add_trace(go.Scatter(x=klucze, y=wartosci, mode='lines+markers', name='Wartości'))
+                '''
+                Generates a plot showing the progress of the player's elo progress in blitz games by hour of game.
+
+                Params:
+                - title (str): The title of the plot. Default is 'Blitz elo progress by hour'.
+                - x_title (str): The title of the x-axis. Default is 'Hour'.
+                - y_title (str): The title of the y-axis. Default is 'Elo'.
+                - type (str): The type of plot to generate. Default is 'bar'. Options are 'bar' or 'line'.
+                '''
+
+                bph = self.ca.player.Blitz.progress_hour()
+
+                klucze = list(sorted(bph.keys()))
+                wartosci = list(bph.values())   
+
+                if type=='line':
+
+                    fig = go.Figure()
+
+                    fig.add_trace(go.Scatter(x=klucze, y=wartosci, mode='lines+markers'))
 
 
-            fig.update_layout(
-                title=f'{title}',
-                xaxis_title=f'{x_title}',
-                yaxis_title=f'{y_title}'
-            )
+                    fig.update_layout(
+                        title=f'{title}',
+                        xaxis_title=f'{x_title}',
+                        yaxis_title=f'{y_title}'
+                    )
 
-            st.plotly_chart(fig)
+                    st.plotly_chart(fig)
 
-        elif type=='bar':
+                elif type=='bar':
 
-            fig = go.Figure()
+                    fig = go.Figure()
 
-            fig.add_trace(go.Bar(x=klucze, y=wartosci))
+                    fig.add_trace(go.Bar(x=klucze, y=wartosci))
 
-       
-            fig.update_layout(
-                title=f'{title}',
-                xaxis_title=f'{x_title}',
-                yaxis_title=f'{y_title}'
-            )
+                    fig.update_layout(
+                        title=f'{title}',
+                        xaxis_title=f'{x_title}',
+                        yaxis_title=f'{y_title}'
+                    )
 
-            st.plotly_chart(fig)
+                    st.plotly_chart(fig)
+
+
+        class rapid:
+                
+            def __init__(self, ca):
+                self.ca = ca
+
+
+            def progress(self, x_title : str ='Number of games', y_title : str ='Elo', plot_title : str ='Elo progress over time'):
+
+                '''
+                Generates a plot showing the progress of the player's elo progress in rapid games over time.
+
+                Params:
+                - x_title (str): The title of the x-axis. Default is 'Number of games'.
+                - y_title (str): The title of the y-axis. Default is 'Elo'.
+                - plot_title (str): The title of the plot. Default is 'Elo progress over time'.
+
+                '''
+
+                raprog = self.ca.player.Rapid.progress()
+
+                fig = go.Figure()
+
+                fig.add_trace(go.Scatter(
+                    x=list(range(len(raprog))),
+                    y=raprog,
+                    mode='lines+markers'
+                ))
+
+
+                fig.update_layout(
+                    title=plot_title,
+                    xaxis_title=f'{x_title}',
+                    yaxis_title=f'{y_title}'
+                )
+
+                st.plotly_chart(fig)
+
+            
+
+
+            def progress_date(self, title : str = 'Rapid elo progress by date', x_title : str = 'Date', y_title : str = 'Elo'):
+                '''
+                Generates a plot showing the progress of the player's elo progress in rapid games by date.
+
+                Params:
+                - title (str): The title of the plot. Default is 'Rapid elo progress by date'.
+                - x_title (str): The title of the x-axis. Default is 'Date'.
+                - y_title (str): The title of the y-axis. Default is 'Elo'.
+
+                '''
+
+                raprog = self.ca.player.Rapid.progress_date()
+
+                klucze = list(sorted(raprog.keys()))
+                wartosci = list(raprog.values())
+
+                fig = go.Figure()
+
+                fig.add_trace(go.Scatter(x=klucze, y=wartosci, mode='lines+markers', name='Wartości'))
+
+                fig.update_layout(
+                    title=f'{title}',
+                    xaxis_title=f'{x_title}',
+                    yaxis_title=f'{y_title}'
+                )
+
+                st.plotly_chart(fig)
+
+
+
+
+            def progress_hour(self, title : str = 'Rapid elo progress by hour', x_title : str = 'Hour', y_title : str = 'Elo',
+                                    type : str = 'bar'):
+                
+                '''
+                Generates a plot showing the progress of the player's elo progress in rapid games by hour of game.
+
+                Params:
+                - title (str): The title of the plot. Default is 'Rapid elo progress by hour'.
+                - x_title (str): The title of the x-axis. Default is 'Hour'.
+                - y_title (str): The title of the y-axis. Default is 'Elo'.
+                - type (str): The type of plot to generate. Default is 'bar'. Options are 'bar' or 'line'.
+                '''
+
+                rph = self.ca.player.Rapid.progress_hour()
+
+                klucze, wartosci = list(sorted(rph.keys())),list(rph.values())
+
+                if type=='line':
+
+
+                    fig = go.Figure()
+
+                    fig.add_trace(go.Scatter(x=klucze, y=wartosci, mode='lines+markers', name='Wartości'))
+
+
+                    fig.update_layout(
+                        title=f'{title}',
+                        xaxis_title=f'{x_title}',
+                        yaxis_title=f'{y_title}'
+                    )
+
+                    st.plotly_chart(fig)
+
+                elif type=='bar':
+
+                    fig = go.Figure()
+
+                    fig.add_trace(go.Bar(x=klucze, y=wartosci))
+
+            
+                    fig.update_layout(
+                        title=f'{title}',
+                        xaxis_title=f'{x_title}',
+                        yaxis_title=f'{y_title}'
+                    )
+
+                    st.plotly_chart(fig)
 
 
 
@@ -1095,209 +1124,214 @@ class CAST:
 
         st.plotly_chart(fig)
     
+    class __Moves:
 
-# i thought about making one func for all the pieces and change it by a param, something like
+        def __init__(self, ca):
+            self.ca = ca
 
-    # def piece_moves(self, PIECE='ROOK/QUEEN/PAWN ETC')
+        def rook(self, plot_colorscale='Viridis', title='Rook moves heatmap', plot_showscale=True, opg=False):
+            '''
+            Generates a heatmap of the squares where the Rook moves were made.
 
-# but for now i think it's better to have them separated as i may make some changes in chessanalytics soon.
-# 
-# 
-# 
-# anyway may change in the future tho   
+            Params:
+            - plot_colorscale (str): The colorscale to use for the heatmap. Default is 'Viridis'.
+            - title (str): The title of the heatmap. Default is 'Moves heatmap'.
+            - plot_showscale (bool): Whether to show the color scale. Default is True.
+            - opg (bool): Whether to show only the player's games. Default is False.
+            '''
 
-    def rook_moves(self, plot_colorscale='Viridis', title='Rook moves heatmap', plot_showscale=True, opg=False):
-        '''
-        Generates a heatmap of the squares where the Rook moves were made.
+            rm = self.ca.moves.rook(only_player_games=opg)
 
-        Params:
-        - plot_colorscale (str): The colorscale to use for the heatmap. Default is 'Viridis'.
-        - title (str): The title of the heatmap. Default is 'Moves heatmap'.
-        - plot_showscale (bool): Whether to show the color scale. Default is True.
-        - opg (bool): Whether to show only the player's games. Default is False.
-        '''
-
-        rm = self.ca.rook_moves(only_player_games=opg)
-
-        CAST.__heatmap1(self,rm,plot_colorscale, title, plot_showscale) # funfact - i forgot to add self as 1 param and it took me 30 mins to figure out 
-                                                                    # what's wrong. by this time i had rewritten both this func and heatmap1 ;)
+            CAST.__heatmap1(rm,plot_colorscale, title, plot_showscale) # funfact - i forgot to add self as 1 param and it took me 30 mins to figure out 
+                                                                        # what's wrong. by this time i had rewritten both this func and heatmap1 ;)
 
 
-    def queen_moves(self,plot_colorscale='Viridis', title='Queen moves heatmap', plot_showscale=True, opg=False):
-        '''
-        Generates a heatmap of the squares where the Queen moves were made.
-        Params:
-        - plot_colorscale (str): The colorscale to use for the heatmap. Default is 'Viridis'.
-        - title (str): The title of the heatmap. Default is 'Moves heatmap'.
-        - plot_showscale (bool): Whether to show the color scale. Default is True.
-        - opg (bool): Whether to show only the player's games. Default is False.
-        '''
-        qm = self.ca.queen_moves(only_player_games=opg)
+        def queen(self,plot_colorscale='Viridis', title='Queen moves heatmap', plot_showscale=True, opg=False):
+            '''
+            Generates a heatmap of the squares where the Queen moves were made.
+            Params:
+            - plot_colorscale (str): The colorscale to use for the heatmap. Default is 'Viridis'.
+            - title (str): The title of the heatmap. Default is 'Moves heatmap'.
+            - plot_showscale (bool): Whether to show the color scale. Default is True.
+            - opg (bool): Whether to show only the player's games. Default is False.
+            '''
+            qm = self.ca.moves.queen(only_player_games=opg)
 
-        CAST.__heatmap1(self,qm,plot_colorscale, title, plot_showscale)
+            CAST.__heatmap1(self,qm,plot_colorscale, title, plot_showscale)
 
 
 
 
 
-    def bishop_moves(self, plot_colorscale='Viridis', title='Bishop moves heatmap', plot_showscale=True,opg=False):
-        '''
-        Generates a heatmap of the squares where the Bishop moves were made.
+        def bishop(self, plot_colorscale='Viridis', title='Bishop moves heatmap', plot_showscale=True,opg=False):
+            '''
+            Generates a heatmap of the squares where the Bishop moves were made.
 
-        Params:
-        - plot_colorscale (str): The colorscale to use for the heatmap. Default is 'Viridis'.
-        - title (str): The title of the heatmap. Default is 'Moves heatmap'.
-        - plot_showscale (bool): Whether to show the color scale. Default is True.
-        - opg (bool): Whether to show only the player's games. Default is False.
-        '''
-        bm = self.ca.bishop_moves(only_player_games=opg)
-        CAST.__heatmap1(self,bm,plot_colorscale, title, plot_showscale)
-
-    def knight_moves(self, plot_colorscale='Viridis', title='Knight moves heatmap', plot_showscale=True, opg=False):
-        '''
-        Generates a heatmap of the squares where the Knight moves were made.
-
-        Params:
-        - plot_colorscale (str): The colorscale to use for the heatmap. Default is 'Viridis'.
-        - title (str): The title of the heatmap. Default is 'Moves heatmap'.
-        - plot_showscale (bool): Whether to show the color scale. Default is True.
-        - opg (bool): Whether to show only the player's games. Default is False.
-        '''
-        km = self.ca.knight_moves(only_player_games=opg)
-
-        CAST.__heatmap1(self,km,plot_colorscale, title, plot_showscale)
-
-    def king_moves(self, plot_colorscale='Viridis', title='King moves heatmap', plot_showscale=True, opg=False):
-        '''
-        Generates a heatmap of the squares where the King moves were made.
-
-        Params:
-        - plot_colorscale (str): The colorscale to use for the heatmap. Default is 'Viridis'.
-        - title (str): The title of the heatmap. Default is 'Moves heatmap'.
-        - plot_showscale (bool): Whether to show the color scale. Default is True.
-        - opg (bool): Whether to show only the player's games. Default is False.
-        '''
-
-        km = self.ca.king_moves(only_player_games=opg)
-
-        CAST.__heatmap1(self,km,plot_colorscale, title, plot_showscale)
+            Params:
+            - plot_colorscale (str): The colorscale to use for the heatmap. Default is 'Viridis'.
+            - title (str): The title of the heatmap. Default is 'Moves heatmap'.
+            - plot_showscale (bool): Whether to show the color scale. Default is True.
+            - opg (bool): Whether to show only the player's games. Default is False.
+            '''
+            bm = self.ca.moves.bishop(only_player_games=opg)
+            CAST.__heatmap1(self,bm,plot_colorscale, title, plot_showscale)
 
 
+        def knight(self, plot_colorscale='Viridis', title='Knight moves heatmap', plot_showscale=True, opg=False):
+            '''
+            Generates a heatmap of the squares where the Knight moves were made.
 
-    def squares_pawn_captures(self, plot_colorscale='Viridis', title='Squares with pawn captures heatmap', plot_showscale=True, opg=False):
-        '''
-        Generates a heatmap of the squares where the Pawn captures were made.
+            Params:
+            - plot_colorscale (str): The colorscale to use for the heatmap. Default is 'Viridis'.
+            - title (str): The title of the heatmap. Default is 'Moves heatmap'.
+            - plot_showscale (bool): Whether to show the color scale. Default is True.
+            - opg (bool): Whether to show only the player's games. Default is False.
+            '''
+            km = self.ca.moves.knight(only_player_games=opg)
 
-        Params:
-        - plot_colorscale (str): The colorscale to use for the heatmap. Default is 'Viridis'.
-        - title (str): The title of the heatmap. Default is 'Moves heatmap'.
-        - plot_showscale (bool): Whether to show the color scale. Default is True.
-        - opg (bool): Whether to show only the player's games. Default is False.
-        '''
+            CAST.__heatmap1(self,km,plot_colorscale, title, plot_showscale)
 
-        spc = self.ca.squares_with_Pawncaptures(only_player_games=opg)
 
-        CAST.__heatmap1(self,spc,plot_colorscale, title, plot_showscale)
+        def king(self, plot_colorscale='Viridis', title='King moves heatmap', plot_showscale=True, opg=False):
+            '''
+            Generates a heatmap of the squares where the King moves were made.
 
-    def squares_knight_captures(self, plot_colorscale='Viridis', title='Squares with knight captures heatmap', plot_showscale=True, opg=False):
-        '''
-        Generates a heatmap of the squares where the King captures were made.
+            Params:
+            - plot_colorscale (str): The colorscale to use for the heatmap. Default is 'Viridis'.
+            - title (str): The title of the heatmap. Default is 'Moves heatmap'.
+            - plot_showscale (bool): Whether to show the color scale. Default is True.
+            - opg (bool): Whether to show only the player's games. Default is False.
+            '''
 
-        Params:
-        - plot_colorscale (str): The colorscale to use for the heatmap. Default is 'Viridis'.
-        - title (str): The title of the heatmap. Default is 'Moves heatmap'.
-        - plot_showscale (bool): Whether to show the color scale. Default is True.
-        - opg (bool): Whether to show only the player's games. Default is False.
-        '''
-        skc = self.ca.squares_with_Knightcaptures(only_player_games=opg)
+            km = self.ca.moves.king(only_player_games=opg)
 
-        CAST.__heatmap1(self,skc,plot_colorscale, title, plot_showscale)
+            CAST.__heatmap1(self,km,plot_colorscale, title, plot_showscale)
 
-    def squares_bishop_captures(self, plot_colorscale='Viridis', title='Squares with bishop captures heatmap', plot_showscale=True, opg=False):
-        '''
-        Generates a heatmap of the squares where the Bishop captures were made.
+    
+    class __Squares:
 
-        Params:
-        - plot_colorscale (str): The colorscale to use for the heatmap. Default is 'Viridis'.
-        - title (str): The title of the heatmap. Default is 'Moves heatmap'.
-        - plot_showscale (bool): Whether to show the color scale. Default is True.
-        - opg (bool): Whether to show only the player's games. Default is False.
-        '''
+        def __init__(self, ca):
+            self.ca = ca
 
-        sbc = self.ca.squares_with_Bishopcaptures(only_player_games=opg)
 
-        CAST.__heatmap1(self,sbc,plot_colorscale, title, plot_showscale)
 
-    def squares_rook_captures(self, plot_colorscale='Viridis', title='Squares with rook captures heatmap', plot_showscale=True, opg=False):
-        '''
-        Generates a heatmap of the squares where the Rook captures were made.
+        def pawn_captures(self, plot_colorscale='Viridis', title='Squares with pawn captures heatmap', plot_showscale=True, opg=False):
+            '''
+            Generates a heatmap of the squares where the Pawn captures were made.
 
-        Params:
-        - plot_colorscale (str): The colorscale to use for the heatmap. Default is 'Viridis'.
-        - title (str): The title of the heatmap. Default is 'Moves heatmap'.
-        - plot_showscale (bool): Whether to show the color scale. Default is True.
-        - opg (bool): Whether to show only the player's games. Default is False.
-        '''
+            Params:
+            - plot_colorscale (str): The colorscale to use for the heatmap. Default is 'Viridis'.
+            - title (str): The title of the heatmap. Default is 'Moves heatmap'.
+            - plot_showscale (bool): Whether to show the color scale. Default is True.
+            - opg (bool): Whether to show only the player's games. Default is False.
+            '''
 
-        src = self.ca.squares_with_Rookcaptures(only_player_moves=opg)
+            spc = self.ca.squares.pawn_captures(only_player_games=opg)
 
-        CAST.__heatmap1(self,src,plot_colorscale, title, plot_showscale)
+            CAST.__heatmap1(self,spc,plot_colorscale, title, plot_showscale)
 
-    def squares_queen_captures(self, plot_colorscale='Viridis', title='Squares with queen captures heatmap', plot_showscale=True, opg=False):
-        '''
-        Generates a heatmap of the squares where the Queen captures were made.
+        def knight_captures(self, plot_colorscale='Viridis', title='Squares with knight captures heatmap', plot_showscale=True, opg=False):
+            '''
+            Generates a heatmap of the squares where the King captures were made.
 
-        Params:
-        - plot_colorscale (str): The colorscale to use for the heatmap. Default is 'Viridis'.
-        - title (str): The title of the heatmap. Default is 'Squares with queen captures heatmap'.
-        - plot_showscale (bool): Whether to show the color scale. Default is True.
-        - opg (bool): Whether to show only the player's games. Default is False.
-        '''
+            Params:
+            - plot_colorscale (str): The colorscale to use for the heatmap. Default is 'Viridis'.
+            - title (str): The title of the heatmap. Default is 'Moves heatmap'.
+            - plot_showscale (bool): Whether to show the color scale. Default is True.
+            - opg (bool): Whether to show only the player's games. Default is False.
+            '''
+            skc = self.ca.squares.knight_captures(only_player_games=opg)
 
-        sqc = self.ca.squares_with_Queencaptures(only_player_games=opg)
+            CAST.__heatmap1(self,skc,plot_colorscale, title, plot_showscale)
 
-        CAST.__heatmap1(self,sqc,plot_colorscale, title, plot_showscale)
 
-    def squares_king_captures(self, plot_colorscale='plasma', title='Squares with king captures heatmap', plot_showscale=True, opg=False):
-        '''
-        Generates a heatmap of the squares where the King captures were made.
+        def bishop_captures(self, plot_colorscale='Viridis', title='Squares with bishop captures heatmap', plot_showscale=True, opg=False):
+            '''
+            Generates a heatmap of the squares where the Bishop captures were made.
 
-        Params:
-        - plot_colorscale (str): The colorscale to use for the heatmap. Default is 'Viridis'.
-        - title (str): The title of the heatmap. Default is 'Squares with king captures heatmap'.
-        - plot_showscale (bool): Whether to show the color scale. Default is True.
-        - opg (bool): Whether to show only the player's games. Default is False.
-        '''
+            Params:
+            - plot_colorscale (str): The colorscale to use for the heatmap. Default is 'Viridis'.
+            - title (str): The title of the heatmap. Default is 'Moves heatmap'.
+            - plot_showscale (bool): Whether to show the color scale. Default is True.
+            - opg (bool): Whether to show only the player's games. Default is False.
+            '''
 
-        skc = self.ca.squares_with_Kingcaptures(only_player_games=opg)
+            sbc = self.ca.squares.bishop_captures(only_player_games=opg)
 
-        CAST.__heatmap1(self,skc, plot_colorscale, title, plot_showscale)    
+            CAST.__heatmap1(self,sbc,plot_colorscale, title, plot_showscale)
 
-    def squares_with_mates(self, plot_colorscale='plasma',title='Squares with checkmates',plot_showscale=True,opg=False):
-        '''
-        Generates a heatmap of the squares where the checkmates were made.
+        def rook_captures(self, plot_colorscale='Viridis', title='Squares with rook captures heatmap', plot_showscale=True, opg=False):
+            '''
+            Generates a heatmap of the squares where the Rook captures were made.
 
-        Params:
-        - plot_colorscale (str): The colorscale to use for the heatmap. Default is 'plasma'.
-        - title (str): The title of the heatmap. Default is 'Squares with checkmates'.
-        - plot_showscale (bool): Whether to show the color scale. Default is True.
-        - opg (bool): Whether to show only the player's games. Default is False.
-        '''
+            Params:
+            - plot_colorscale (str): The colorscale to use for the heatmap. Default is 'Viridis'.
+            - title (str): The title of the heatmap. Default is 'Moves heatmap'.
+            - plot_showscale (bool): Whether to show the color scale. Default is True.
+            - opg (bool): Whether to show only the player's games. Default is False.
+            '''
 
-        swm = self.ca.squares_with_mates(only_player_games=opg)
+            src = self.ca.squares.rook_captures(only_player_moves=opg)
 
-        CAST.__heatmap1(self,swm, plot_colorscale, title, plot_showscale)
+            CAST.__heatmap1(self,src,plot_colorscale, title, plot_showscale)
 
-    def squares_with_checks(self, plot_colorscale='plasma',title='Squares with checks',plot_showscale=True,opg=False):
-        '''
-        Generates a heatmap of the squares where the checks were made.
+        def queen_captures(self, plot_colorscale='plasma', title='Squares with queen captures heatmap', plot_showscale=True, opg=False):
+            '''
+            Generates a heatmap of the squares where the Queen captures were made.
 
-        Params:
-        - plot_colorscale (str): The colorscale to use for the heatmap. Default is 'plasma'.
-        - title (str): The title of the heatmap. Default is 'Squares with checks'.
-        - plot_showscale (bool): Whether to show the color scale. Default is True.
-        - opg (bool): Whether to show only the player's games. Default is False.
-        '''
+            Params:
+            - plot_colorscale (str): The colorscale to use for the heatmap. Default is 'Viridis'.
+            - title (str): The title of the heatmap. Default is 'Squares with queen captures heatmap'.
+            - plot_showscale (bool): Whether to show the color scale. Default is True.
+            - opg (bool): Whether to show only the player's games. Default is False.
+            '''
 
-        swc = self.ca.squares_with_checks(only_player_games=opg)
-        CAST.__heatmap1(self,swc, plot_colorscale, title, plot_showscale)
+            sqc = self.ca.squares.queen_captures(only_player_games=opg)
+
+            CAST.__heatmap1(self,sqc,plot_colorscale, title, plot_showscale)
+
+        def king_captures(self, plot_colorscale='plasma', title='Squares with king captures heatmap', plot_showscale=True, opg=False):
+            '''
+            Generates a heatmap of the squares where the King captures were made.
+
+            Params:
+            - plot_colorscale (str): The colorscale to use for the heatmap. Default is 'Viridis'.
+            - title (str): The title of the heatmap. Default is 'Squares with king captures heatmap'.
+            - plot_showscale (bool): Whether to show the color scale. Default is True.
+            - opg (bool): Whether to show only the player's games. Default is False.
+            '''
+
+            skc = self.ca.squares.king_captures(only_player_games=opg)
+
+            CAST.__heatmap1(self,skc, plot_colorscale, title, plot_showscale)    
+
+        def checkmates(self, plot_colorscale='plasma',title='Squares with checkmates',plot_showscale=True,opg=False):
+            '''
+            Generates a heatmap of the squares where the checkmates were made.
+
+            Params:
+            - plot_colorscale (str): The colorscale to use for the heatmap. Default is 'plasma'.
+            - title (str): The title of the heatmap. Default is 'Squares with checkmates'.
+            - plot_showscale (bool): Whether to show the color scale. Default is True.
+            - opg (bool): Whether to show only the player's games. Default is False.
+            '''
+
+            swm = self.ca.squares.checkmates(only_player_games=opg)
+
+            CAST.__heatmap1(self,swm, plot_colorscale, title, plot_showscale)
+
+        def checks(self, plot_colorscale='plasma',title='Squares with checks',plot_showscale=True,opg=False):
+            '''
+            Generates a heatmap of the squares where the checks were made.
+
+            Params:
+            - plot_colorscale (str): The colorscale to use for the heatmap. Default is 'plasma'.
+            - title (str): The title of the heatmap. Default is 'Squares with checks'.
+            - plot_showscale (bool): Whether to show the color scale. Default is True.
+            - opg (bool): Whether to show only the player's games. Default is False.
+            '''
+
+            swc = self.ca.squares.checks(only_player_games=opg)
+            CAST.__heatmap1(self,swc, plot_colorscale, title, plot_showscale)
+
+
