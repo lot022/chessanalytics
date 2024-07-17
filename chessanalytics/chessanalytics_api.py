@@ -243,14 +243,23 @@ class API:
 
             return len(gry[0].split()) if not game else gry[0]
         
-        def fastest_check(self, game=True) -> str:
+
+        def fastest_check(self, game=True):
             dt = self.inst.games.get_games()
+
+            d = {}
             
-            gry = [el for el in dt if '+' in el]
+            for el in dt:
+                for move in el.split():
+                    if '+' in move:
+                        d[el] = el.split().index(move)
+                        break
 
-            gry = sorted(gry, key=lambda x: len(x.split()))   
+            z = min(d.values())
 
-            return len(gry[0].split()) if not game else gry[0]
+            for k,v in d.items():
+                if v == z:
+                    return len(k.split()) if not game else k
         
         def shortest_game(self, game=True):
             dt = self.inst.games.get_games()
